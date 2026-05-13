@@ -1,0 +1,27 @@
+[build-system]
+requires = ["maturin>=1.9.4,<2"]
+build-backend = "maturin"
+
+[project]
+name = "scan-cpd"
+version = "0.1.0"
+description = "SCAN change-point detection with a Rust core and Python API"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.23",
+    "matplotlib>=3.6",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[tool.maturin]
+python-source = "python"
+module-name = "scan._scan_rust"
+features = ["pyo3/extension-module"]

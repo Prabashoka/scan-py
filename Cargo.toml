@@ -1,0 +1,20 @@
+[package]
+name = "scan-rust"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "_scan_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module"] }
+rand = "0.9"
+rand_xoshiro = "0.7"          # 0.7 targets rand_core 0.9, matching rand 0.9
+rayon = "1"
+
+[profile.release]
+opt-level = 3
+lto = "fat"                   # cross-crate inlining across pyo3 + rayon boundary
+codegen-units = 1             # single CGU enables full whole-program optimisation
+panic = "abort"               # removes unwinding tables; smaller binary, faster runtime
