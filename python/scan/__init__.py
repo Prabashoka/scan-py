@@ -11,7 +11,7 @@ from typing import Iterable, List, Optional, Tuple, Dict, Any
 
 import numpy as np
 
-from . import _scan_rust
+from . import _scanpy
 
 __version__ = "0.1.0"
 
