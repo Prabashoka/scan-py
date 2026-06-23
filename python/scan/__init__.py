@@ -15,7 +15,6 @@ from .plotting import (
 )
 from .result import ScanResult, WindowResult
 from .simulator import (
-    BENCHMARK_CONFIG,
     choose_window_sizes,
     run_one_benchmark,
     safe_min_seg_len,
@@ -32,7 +31,6 @@ from .statistics import (
 __version__ = "0.1.0"
 
 __all__ = [
-    "BENCHMARK_CONFIG",
     "ScanResult",
     "WindowResult",
     "adaptive_threshold",

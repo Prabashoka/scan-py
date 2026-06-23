@@ -1,22 +1,16 @@
 # SCAN Py
 
-SCAN Py is a Python package for change-point detection using **S**equential **C**hange-point **A**nalysis via **N**onparametric window screening. It provides a research-friendly Python API backed by a Rust/PyO3 computation core.
-
-Install the package as `scan-py` and import it as `scan`:
-
-```python
-from scan import scan_cpd
-```
-
-Change points use Python split indexing: a returned value `t` denotes the split between `x[:t]` and `x[t:]`.
+SCAN Py provides tools for detecting change points in univariate time series using sequential nonparametric window screening. It is aimed at research workflows where users need to simulate time series, detect changes across multiple window sizes, localize change-point positions, and visualize the resulting segmentation. The Python interface is backed by a Rust/PyO3 core for efficient computation.
 
 ## Installation
+
+SCAN Py can be installed from PyPI using `pip`:
 
 ```bash
 pip install scan-py
 ```
 
-For local development:
+For local development, clone the repository and build the package in an isolated virtual environment:
 
 ```bash
 python -m venv .venv
@@ -25,42 +19,21 @@ python -m pip install -U pip maturin
 maturin develop --release
 ```
 
-For tests:
+## Change-point detection
 
-```bash
-python -m pip install -e ".[test]"
-python -m pytest tests
-```
+The main function provided by SCAN Py is `scan_cpd`, which provides a unified interface for running the SCAN change-point detection framework. It detects change points in a one-dimensional time series by scanning the data with multiple local window sizes. The type of change to detect is controlled by the `change_type` argument.
 
-## Quick Start
+Supported change types include:
 
-```python
-import numpy as np
-from scan import scan_cpd, plot_change_points
+| `change_type` | Explanation |
+|---|---|
+| `"mean"` | Detects changes mainly in the location or average level of the series. |
+| `"variance"` | Detects changes mainly in the variability or scale of the series. |
+| `"distribution"` | Detects broader distributional changes, not restricted to only mean or variance shifts (includes both mean and variance together). |
 
-rng = np.random.default_rng(123)
-x = np.r_[
-    rng.normal(0.0, 1.0, 150),
-    rng.normal(1.8, 1.0, 150),
-    rng.normal(-0.7, 1.0, 150),
-]
+## Example: Detecting Multiple Mean Changes
 
-result = scan_cpd(
-    x,
-    window_sizes=[20, 30, 40],
-    alpha=0.05,
-    n_boot=100,
-    vote_threshold=0.5,
-    random_state=123,
-    n_jobs=4,
-)
-
-print(result.change_points)
-print(result.scores)
-plot_change_points(x, result)
-```
-
-## Reproducible Mean-Change Simulation
+The following example simulates a long univariate time series with multiple mean changes and applies `scan_cpd` using several window sizes. This illustrates a typical research workflow: simulate data, standardize the series, run SCAN, and compare the number of detected change points with the true number.
 
 ```python
 import numpy as np
@@ -68,9 +41,9 @@ from scan import scan_cpd, simulate_time_series
 
 T = 20_000
 K = 67
-spacing_hint = 298
 min_seg_len = 235
 seed = 500
+
 window_sizes = [104, 114, 115, 120, 123, 126, 133]
 
 x, true_cps, means, sigmas = simulate_time_series(
@@ -80,6 +53,7 @@ x, true_cps, means, sigmas = simulate_time_series(
     change_type="mean",
     seed=seed,
 )
+
 x_std = (x - np.mean(x)) / np.std(x)
 
 result = scan_cpd(
@@ -87,28 +61,40 @@ result = scan_cpd(
     window_sizes=window_sizes,
     n_boot=400,
     alpha=1,
-    vote_threshold=0.7,
+    vote_threshold=0.5,
     random_state=seed,
     n_jobs=8,
     change_type="mean",
     batch_size=32,
 )
+```
+## Output
 
-print(f"Simulating T={T}, K={K}, spacing_hint={spacing_hint}, min_seg_len={min_seg_len}")
-print("Window sizes:", window_sizes)
-print("True K:", len(true_cps))
-print("Detected K:", len(result.change_points))
+`scan_cpd` returns a `ScanResult` object containing the final detected `change points`, `scores`, `votes`, `thresholds`, `diagnostics`, `parameters`, and `metadata`.
 
-# Expected summary for this seed/configuration:
-# Simulating T=20000, K=67, spacing_hint=298, min_seg_len=235
-# Window sizes: [104, 114, 115, 120, 123, 126, 133]
-# True K: 67
-# Detected K: 67
+The main attribute is:
+
+```python
+result.change_points
 ```
 
-## Main Detector API
+The `scan_cpd` function returns a `ScanResult` object. This object collects the main outputs of the SCAN procedure in one place, including the final detected change points, detection scores, voting information, per-window diagnostics, threshold values, input parameters, metadata, and the raw backend output.
 
-### `scan_cpd(...)`
+| Attribute | Description | Why it is useful |
+|---|---|---|
+| `change_points` | Final estimated change-point locations returned by SCAN. | This is the main output users usually need for downstream analysis or plotting. |
+| `scores` | Detection scores associated with candidate or final change points. | Helps assess the relative strength of detected changes. |
+| `votes` | Number or proportion of window sizes that support each detected change point. | Useful for understanding how stable a detection is across multiple window sizes. |
+| `per_window_diagnostics` | Diagnostic information from each individual window size. | Helps inspect which window sizes contributed to each detection. |
+| `thresholds` | Bootstrap or calibration thresholds used during detection. | Important for reproducibility and for understanding the rejection rule. |
+| `parameters` | The parameter values used in the call to `scan_cpd`, such as `window_sizes`, `alpha`, `n_boot`, and `vote_threshold`. | Makes the result self-contained and easier to reproduce. |
+| `metadata` | Additional run information, such as package version, runtime information, random seed, or backend details. | Useful for experiments, reporting, debugging, and reproducibility. |
+| `raw_backend_output` | Raw output returned by the Rust/PyO3 backend before post-processing. | Mainly useful for advanced users, debugging, or development. |
+
+```python
+print("Detected K:", len(result.change_points))
+print("Detected change points:", result.change_points)
+````
 
 Runs the full SCAN / Ensemble SCAN detector and returns a `ScanResult`.
 
