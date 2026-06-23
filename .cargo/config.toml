@@ -1,18 +1,2 @@
-# Place this file at .cargo/config.toml in your project root.
-# Enables AVX2/FMA on modern x86-64, NEON on Apple Silicon, etc.
-# Only affects local builds — do not commit if you distribute wheels
-# built on this machine to users with older CPUs.
-[target.x86_64-unknown-linux-gnu]
-rustflags = ["-C", "target-cpu=native"]
-
-[target.x86_64-unknown-linux-musl]
-rustflags = ["-C", "target-cpu=native"]
-
-[target.x86_64-apple-darwin]
-rustflags = ["-C", "target-cpu=native"]
-
-[target.aarch64-apple-darwin]
-rustflags = ["-C", "target-cpu=native"]
-
-[target.x86_64-pc-windows-msvc]
-rustflags = ["-C", "target-cpu=native"]
+﻿# Keep repository builds portable. Local CPU-specific flags such as
+# `-C target-cpu=native` should be set outside the project when benchmarking.

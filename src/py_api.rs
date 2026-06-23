@@ -1,15 +1,25 @@
-use crate::detect::run_scan_detector;
-use crate::refine::{refine_cp_cusum, refine_cp_wasserstein};
-use crate::types::ScanResult;
+﻿use crate::detect::{detect_for_window, run_scan_detector};
+use crate::refine::{refine_cp_cusum, refine_cp_wasserstein, refine_for_change_type};
+use crate::stats::PrefixStats;
+use crate::types::{ChangeType, ScanResult, WindowScanResult};
 use crate::validation::validate_series;
+use crate::wasserstein::wasserstein_1d;
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
+fn window_result_to_py<'py>(py: Python<'py>, result: WindowScanResult) -> PyResult<Bound<'py, PyDict>> {
+    let out = PyDict::new(py);
+    out.set_item("change_points", result.change_points)?;
+    out.set_item("starts", result.starts)?;
+    out.set_item("statistics", result.statistics)?;
+    out.set_item("lower_thresholds", result.lower_thresholds)?;
+    out.set_item("upper_thresholds", result.upper_thresholds)?;
+    out.set_item("localized_regions", result.localized_regions)?;
+    Ok(out)
+}
+
 /// Convert the internal Rust result into a Python dictionary.
-///
-/// Timing information is intentionally omitted. This detailed function keeps
-/// the per-window and voting information, while the `scan_cpd_*` wrappers below
-/// return only the final predicted change-point list.
 fn scan_result_to_py<'py>(py: Python<'py>, result: ScanResult) -> PyResult<Bound<'py, PyDict>> {
     let root = PyDict::new(py);
 
@@ -18,6 +28,12 @@ fn scan_result_to_py<'py>(py: Python<'py>, result: ScanResult) -> PyResult<Bound
         cp_dict.set_item(w, cps)?;
     }
     root.set_item("cp_dict", cp_dict)?;
+
+    let window_results = PyDict::new(py);
+    for (w, info) in result.window_results {
+        window_results.set_item(w, window_result_to_py(py, info)?)?;
+    }
+    root.set_item("window_results", window_results)?;
 
     let segments = PyDict::new(py);
     for (name, info) in result.segments {
@@ -100,6 +116,48 @@ fn scan_detector<'py>(
     scan_result_to_py(py, result)
 }
 
+#[pyfunction]
+#[pyo3(signature = (series, window_size, n_perm=300, alpha_q=1.0, seed=123, change_type="mean", eps=1e-12, b=None, taper_ratio=0.5, center=true, batch_size=32))]
+#[allow(clippy::too_many_arguments)]
+fn scan_single_window<'py>(
+    py: Python<'py>,
+    series: Vec<f64>,
+    window_size: usize,
+    n_perm: usize,
+    alpha_q: f64,
+    seed: u64,
+    change_type: &str,
+    eps: f64,
+    b: Option<usize>,
+    taper_ratio: f64,
+    center: bool,
+    batch_size: usize,
+) -> PyResult<Bound<'py, PyDict>> {
+    validate_series(&series)?;
+    if window_size == 0 {
+        return Err(PyValueError::new_err("window_size must be positive"));
+    }
+
+    let alpha_percent = if alpha_q <= 1.0 { 100.0 * alpha_q } else { alpha_q };
+    let prefix = PrefixStats::from_series(&series);
+    let (_, result) = detect_for_window(
+        &series,
+        &prefix,
+        window_size,
+        n_perm,
+        alpha_percent,
+        seed,
+        ChangeType::parse(change_type)?,
+        eps,
+        b,
+        taper_ratio,
+        center,
+        batch_size.max(1),
+    )?;
+
+    window_result_to_py(py, result)
+}
+
 #[allow(clippy::too_many_arguments)]
 fn scan_cpd_base(
     series: Vec<f64>,
@@ -141,13 +199,7 @@ fn scan_cpd_base(
         .out
         .leaders_scores
         .iter()
-        .filter_map(|(&cp, &score)| {
-            if score >= threshold {
-                Some(cp + 1)
-            } else {
-                None
-            }
-        })
+        .filter_map(|(&cp, &score)| if score >= threshold { Some(cp) } else { None })
         .collect();
 
     cpts.sort_unstable();
@@ -174,26 +226,13 @@ fn scan_cpd_mean(
     batch_size: usize,
 ) -> PyResult<Vec<usize>> {
     scan_cpd_base(
-        series,
-        window_sizes,
-        n_perm,
-        alpha_q,
-        seed,
-        tol,
-        workers,
-        backend,
-        threshold,
-        "mean",
-        eps,
-        b,
-        taper_ratio,
-        center,
-        batch_size,
+        series, window_sizes, n_perm, alpha_q, seed, tol, workers, backend, threshold, "mean", eps,
+        b, taper_ratio, center, batch_size,
     )
 }
 
 #[pyfunction]
-#[pyo3(signature = (series, window_sizes, n_perm=400, alpha_q=10.0, seed=123, tol=None, workers=None, backend="thread", threshold=5.0, eps=1e-12, b=None, taper_ratio=0.5, center=true, batch_size=32))]
+#[pyo3(signature = (series, window_sizes, n_perm=400, alpha_q=10.0, seed=123, tol=None, workers=None, backend="thread", threshold=0.5, eps=1e-12, b=None, taper_ratio=0.5, center=true, batch_size=32))]
 #[allow(clippy::too_many_arguments)]
 fn scan_cpd_var(
     series: Vec<f64>,
@@ -212,21 +251,8 @@ fn scan_cpd_var(
     batch_size: usize,
 ) -> PyResult<Vec<usize>> {
     scan_cpd_base(
-        series,
-        window_sizes,
-        n_perm,
-        alpha_q,
-        seed,
-        tol,
-        workers,
-        backend,
-        threshold,
-        "var",
-        eps,
-        b,
-        taper_ratio,
-        center,
-        batch_size,
+        series, window_sizes, n_perm, alpha_q, seed, tol, workers, backend, threshold, "var", eps,
+        b, taper_ratio, center, batch_size,
     )
 }
 
@@ -250,21 +276,8 @@ fn scan_cpd_meanvar(
     batch_size: usize,
 ) -> PyResult<Vec<usize>> {
     scan_cpd_base(
-        series,
-        window_sizes,
-        n_perm,
-        alpha_q,
-        seed,
-        tol,
-        workers,
-        backend,
-        threshold,
-        "meanvar",
-        eps,
-        b,
-        taper_ratio,
-        center,
-        batch_size,
+        series, window_sizes, n_perm, alpha_q, seed, tol, workers, backend, threshold, "meanvar", eps,
+        b, taper_ratio, center, batch_size,
     )
 }
 
@@ -280,13 +293,40 @@ fn refine_wasserstein(series: Vec<f64>) -> PyResult<(usize, Vec<f64>)> {
     refine_cp_wasserstein(&series)
 }
 
+#[pyfunction]
+#[pyo3(signature = (series, change_type="meanvar"))]
+fn localize_cp(series: Vec<f64>, change_type: &str) -> PyResult<usize> {
+    validate_series(&series)?;
+    refine_for_change_type(&series, ChangeType::parse(change_type)?)
+}
+
+#[pyfunction]
+fn wasserstein_statistic(left: Vec<f64>, right: Vec<f64>) -> PyResult<f64> {
+    if left.is_empty() || right.is_empty() {
+        return Err(PyValueError::new_err("left and right samples must be non-empty"));
+    }
+    if left.iter().chain(right.iter()).any(|x| !x.is_finite()) {
+        return Err(PyValueError::new_err("samples contain NaN or infinite values"));
+    }
+    Ok(wasserstein_1d(&left, &right))
+}
+
+#[pyfunction]
+fn ipm_statistic(left: Vec<f64>, right: Vec<f64>) -> PyResult<f64> {
+    wasserstein_statistic(left, right)
+}
+
 /// Register all Python-callable functions with the module declared in `lib.rs`.
 pub(crate) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(scan_detector, m)?)?;
+    m.add_function(wrap_pyfunction!(scan_single_window, m)?)?;
     m.add_function(wrap_pyfunction!(scan_cpd_mean, m)?)?;
     m.add_function(wrap_pyfunction!(scan_cpd_var, m)?)?;
     m.add_function(wrap_pyfunction!(scan_cpd_meanvar, m)?)?;
     m.add_function(wrap_pyfunction!(refine_cusum, m)?)?;
     m.add_function(wrap_pyfunction!(refine_wasserstein, m)?)?;
+    m.add_function(wrap_pyfunction!(localize_cp, m)?)?;
+    m.add_function(wrap_pyfunction!(wasserstein_statistic, m)?)?;
+    m.add_function(wrap_pyfunction!(ipm_statistic, m)?)?;
     Ok(())
 }

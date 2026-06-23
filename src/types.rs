@@ -1,4 +1,4 @@
-use pyo3::exceptions::PyValueError;
+﻿use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use std::collections::BTreeMap;
 
@@ -14,8 +14,8 @@ impl ChangeType {
     pub(crate) fn parse(value: &str) -> PyResult<Self> {
         match value.to_ascii_lowercase().as_str() {
             "mean" => Ok(Self::Mean),
-            "var" => Ok(Self::Var),
-            "meanvar" => Ok(Self::MeanVar),
+            "var" | "variance" => Ok(Self::Var),
+            "meanvar" | "distribution" | "wasserstein" => Ok(Self::MeanVar),
             other => Err(PyValueError::new_err(format!(
                 "change_type must be one of {{'mean', 'var', 'meanvar'}}, got {other:?}"
             ))),
@@ -31,6 +31,17 @@ pub(crate) struct SegmentInfo {
     pub(crate) segment_vote: usize,
 }
 
+/// Detailed output for a single scan window.
+#[derive(Clone, Debug)]
+pub(crate) struct WindowScanResult {
+    pub(crate) change_points: Vec<usize>,
+    pub(crate) starts: Vec<usize>,
+    pub(crate) statistics: Vec<f64>,
+    pub(crate) lower_thresholds: Vec<f64>,
+    pub(crate) upper_thresholds: Vec<f64>,
+    pub(crate) localized_regions: Vec<(usize, usize)>,
+}
+
 /// Aggregated voting output used by the Python API.
 #[derive(Clone, Debug)]
 pub(crate) struct AggregatedOut {
@@ -41,12 +52,10 @@ pub(crate) struct AggregatedOut {
 }
 
 /// Full internal scan result before conversion to Python dictionaries.
-///
-/// Timing fields are intentionally not stored here. The Python-facing API
-/// returns predicted change-points rather than `(change_points, runtime)`.
 #[derive(Clone, Debug)]
 pub(crate) struct ScanResult {
     pub(crate) cp_dict: BTreeMap<usize, Vec<usize>>,
+    pub(crate) window_results: BTreeMap<usize, WindowScanResult>,
     pub(crate) segments: BTreeMap<String, SegmentInfo>,
     pub(crate) out: AggregatedOut,
 }
