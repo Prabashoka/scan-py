@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from plotnine import (
     aes,
+    element_text,
     facet_wrap,
     geom_col,
     geom_hline,
@@ -16,6 +17,8 @@ from plotnine import (
     geom_vline,
     ggplot,
     labs,
+    scale_x_continuous,
+    theme,
     theme_minimal,
 )
 
@@ -77,27 +80,47 @@ def plot_vote_scree(result: ScanResult):
     )
 
 
-def plot_window_votes(result: ScanResult):
-    """Plot ensemble vote counts for candidate change-points as bars."""
+def plot_window_votes(result: ScanResult, max_x_labels: int = 12, x_label_angle: int = 45):
+    """Plot ensemble vote counts for candidate change-points as bars.
+
+    The x-axis is numeric rather than categorical so large simulations do not
+    draw one overlapping label per candidate change-point.
+    """
+    selected_cps = set(result.change_points)
     rows = [
         {
             "change_point": int(cp),
             "votes": int(vote),
             "score": float(result.scores.get(cp, 0.0)),
-            "selected": cp in set(result.change_points),
+            "selected": int(cp) in selected_cps,
         }
         for cp, vote in result.votes.items()
     ]
     df = pd.DataFrame(rows, columns=["change_point", "votes", "score", "selected"])
+    df = df.sort_values("change_point")
 
     n_windows = max(1, len(result.window_results))
     vote_threshold = float(result.parameters.get("vote_threshold", 0.5))
     threshold_votes = vote_threshold * n_windows
 
+    if df.empty:
+        bar_width = 0.72
+        x_breaks = []
+    else:
+        cps = df["change_point"].to_numpy(dtype=float)
+        gaps = np.diff(np.unique(cps))
+        positive_gaps = gaps[gaps > 0]
+        bar_width = float(max(1.0, 0.65 * np.median(positive_gaps))) if len(positive_gaps) else 1.0
+
+        n_labels = min(max(2, int(max_x_labels)), len(cps))
+        x_breaks = np.linspace(float(cps.min()), float(cps.max()), n_labels)
+        x_breaks = np.unique(np.round(x_breaks).astype(int)).tolist()
+
     p = (
-        ggplot(df, aes("factor(change_point)", "votes", fill="selected"))
-        + geom_col(width=0.72, alpha=0.9)
+        ggplot(df, aes("change_point", "votes", fill="selected"))
+        + geom_col(width=bar_width, alpha=0.9)
         + geom_hline(yintercept=threshold_votes, linetype="dashed", color="#b23a48")
+        + scale_x_continuous(breaks=x_breaks)
         + labs(
             x="Candidate change-point",
             y="Window votes",
@@ -105,6 +128,7 @@ def plot_window_votes(result: ScanResult):
             title="Window vote counts",
         )
         + theme_minimal()
+        + theme(axis_text_x=element_text(rotation=x_label_angle, ha="right"))
     )
     return p
 

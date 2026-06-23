@@ -14,7 +14,7 @@ def match_change_points(
     estimated_cps: Iterable[int],
     tolerance: int = 10,
 ) -> List[Tuple[int, int]]:
-    """Greedily match true and estimated change-points within a tolerance."""
+    """Match true and estimated change-points within a tolerance."""
     true = _clean_cps(true_cps)
     estimated = _clean_cps(estimated_cps)
     tolerance = int(tolerance)

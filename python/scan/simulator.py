@@ -4,11 +4,22 @@ from __future__ import annotations
 
 import gc
 import time as pytime
-from typing import List
+from typing import Any
 
 import numpy as np
 
 from .detector import scan_cpd
+
+BENCHMARK_CONFIG: list[tuple[int, int, int]] = [
+    (500, 4, 125),
+    (1000, 25, 67),
+    (5000, 42, 116),
+    (10000, 53, 188),
+    (20000, 67, 298),
+    (50000, 92, 537),
+    (100000, 116, 862),
+    (1000000, 250, 4000),
+]
 
 
 def simulate_time_series(
@@ -18,28 +29,7 @@ def simulate_time_series(
     change_type: str = "meanvar",
     seed: int = 123,
 ):
-    """Simulate a univariate time series with multiple change points.
-
-    Parameters
-    ----------
-    n
-        Length of the time series.
-    n_cps
-        Number of change points.
-    min_seg_len
-        Minimum segment length.
-    change_type
-        One of ``"mean"``, ``"var"``, or ``"meanvar"``.
-    seed
-        Random seed.
-
-    Returns
-    -------
-    x, cps, means, sigmas
-        Simulated observations, true change-points, segment means, and segment
-        standard deviations.
-    """
-
+    """Simulate a univariate time series with multiple change points."""
     change_type = str(change_type).lower()
     if change_type not in {"mean", "var", "meanvar"}:
         raise ValueError("change_type must be one of {'mean', 'var', 'meanvar'}")
@@ -84,7 +74,7 @@ def safe_min_seg_len(n: int, k: int, spacing_hint: int, safety_fraction: float =
     return max(5, min_seg_len)
 
 
-def choose_window_sizes(n: int, n_windows: int = 7, seed: int = 500) -> List[int]:
+def choose_window_sizes(n: int, n_windows: int = 7, seed: int = 500) -> list[int]:
     """Choose a reproducible set of safe scan window sizes."""
     rng = np.random.default_rng(seed)
     upper = int(np.sqrt(int(n)))
@@ -109,3 +99,68 @@ def choose_window_sizes(n: int, n_windows: int = 7, seed: int = 500) -> List[int
     return window_sizes.astype(int).tolist()
 
 
+def run_one_benchmark(
+    n: int,
+    k: int,
+    spacing_hint: int,
+    change_type: str = "meanvar",
+    n_windows: int = 7,
+    n_boot: int = 400,
+    alpha: float = 1,
+    vote_threshold: float = 0.7,
+    n_jobs: int | None = 48,
+    batch_size: int = 32,
+    seed: int = 500,
+) -> dict[str, Any]:
+    """Simulate one benchmark series and run ``scan_cpd`` on it."""
+    min_seg_len = safe_min_seg_len(n=n, k=k, spacing_hint=spacing_hint, safety_fraction=0.8)
+
+    x, true_cps, means, sigmas = simulate_time_series(
+        n=n,
+        n_cps=k,
+        min_seg_len=min_seg_len,
+        change_type=change_type,
+        seed=seed,
+    )
+
+    x = np.asarray(x, dtype=np.float64)
+    x_std = (x - np.mean(x)) / np.std(x)
+    window_sizes = choose_window_sizes(n=n, n_windows=n_windows, seed=seed)
+
+    start_wall = pytime.perf_counter()
+    result = scan_cpd(
+        x_std,
+        window_sizes=window_sizes,
+        n_boot=n_boot,
+        alpha=alpha,
+        vote_threshold=vote_threshold,
+        random_state=seed,
+        n_jobs=n_jobs,
+        change_type=change_type,
+        batch_size=batch_size,
+    )
+    wall_time = pytime.perf_counter() - start_wall
+
+    out: dict[str, Any] = {
+        "T": int(n),
+        "K_true": int(k),
+        "spacing_hint": int(spacing_hint),
+        "min_seg_len_used": int(min_seg_len),
+        "window_sizes": window_sizes,
+        "n_boot": int(n_boot),
+        "vote_threshold": float(vote_threshold),
+        "n_jobs": n_jobs,
+        "batch_size": int(batch_size),
+        "n_detected": len(result.change_points),
+        "elapsed_seconds": result.metadata["elapsed_seconds"],
+        "wall_time": wall_time,
+        "true_cps": true_cps,
+        "detected_cps": result.change_points,
+        "result": result,
+        "means": means,
+        "sigmas": sigmas,
+    }
+
+    del x, x_std
+    gc.collect()
+    return out

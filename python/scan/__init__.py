@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from . import _scan_rust
 from .bootstrap import adaptive_threshold, tapered_block_bootstrap
-from .detector import scan_cpd, scan_cpd_mean, scan_cpd_meanvar, scan_cpd_var, scan_single_window
+from .detector import scan_cpd, scan_single_window
 from .ensemble import ensemble_vote, merge_change_points
 from .metrics import covering_metric, f1_score_cpd, match_change_points, precision_recall_cpd
 from .plotting import (

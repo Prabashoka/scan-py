@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import Iterable, List, Optional, Sequence
 
 import numpy as np
 
@@ -234,97 +234,3 @@ def scan_single_window(
     )
     return WindowResult.from_raw(window_size, raw)
 
-
-def _compat_scan(
-    series: Iterable[float],
-    window_sizes: Sequence[int],
-    *,
-    n_perm: int,
-    alpha_q: float,
-    seed: int,
-    tol: Optional[int],
-    workers: Optional[int],
-    threshold: float,
-    change_type: str,
-    eps: float,
-    b: Optional[int],
-    taper_ratio: float,
-    batch_size: int,
-) -> Tuple[List[int], float]:
-    taper = "none" if taper_ratio == 0 else "tukey"
-    result = scan_cpd(
-        series,
-        window_sizes=window_sizes,
-        alpha=alpha_q,
-        n_boot=n_perm,
-        vote_threshold=threshold,
-        block_length=b,
-        taper=taper,
-        tolerance=tol,
-        random_state=seed,
-        n_jobs=workers,
-        change_type=change_type,
-        eps=eps,
-        batch_size=batch_size,
-    )
-    return result.change_points, float(result.metadata["elapsed_seconds"])
-
-
-def scan_cpd_mean(
-    series: Iterable[float],
-    window_sizes: Sequence[int],
-    n_perm: int = 300,
-    alpha_q: float = 1.0,
-    seed: int = 123,
-    tol: Optional[int] = None,
-    workers: Optional[int] = 8,
-    backend: str = "thread",
-    threshold: float = 0.5,
-    eps: float = 1e-12,
-    b: Optional[int] = None,
-    taper_ratio: float = 0.5,
-    center: bool = True,
-    batch_size: int = 32,
-) -> Tuple[List[int], float]:
-    """Compatibility wrapper for mean-shift detection."""
-    return _compat_scan(series, window_sizes, n_perm=n_perm, alpha_q=alpha_q, seed=seed, tol=tol, workers=workers, threshold=threshold, change_type="mean", eps=eps, b=b, taper_ratio=taper_ratio, batch_size=batch_size)
-
-
-def scan_cpd_var(
-    series: Iterable[float],
-    window_sizes: Sequence[int],
-    n_perm: int = 400,
-    alpha_q: float = 0.05,
-    seed: int = 123,
-    tol: Optional[int] = None,
-    workers: Optional[int] = 8,
-    backend: str = "thread",
-    threshold: float = 0.5,
-    eps: float = 1e-12,
-    b: Optional[int] = None,
-    taper_ratio: float = 0.5,
-    center: bool = True,
-    batch_size: int = 32,
-) -> Tuple[List[int], float]:
-    """Compatibility wrapper for variance-sensitive detection."""
-    return _compat_scan(series, window_sizes, n_perm=n_perm, alpha_q=alpha_q, seed=seed, tol=tol, workers=workers, threshold=threshold, change_type="var", eps=eps, b=b, taper_ratio=taper_ratio, batch_size=batch_size)
-
-
-def scan_cpd_meanvar(
-    series: Iterable[float],
-    window_sizes: Sequence[int],
-    n_perm: int = 300,
-    alpha_q: float = 0.05,
-    seed: int = 123,
-    tol: Optional[int] = None,
-    workers: Optional[int] = 8,
-    backend: str = "thread",
-    threshold: float = 0.5,
-    eps: float = 1e-12,
-    b: Optional[int] = None,
-    taper_ratio: float = 0.5,
-    center: bool = True,
-    batch_size: int = 32,
-) -> Tuple[List[int], float]:
-    """Compatibility wrapper for distributional detection."""
-    return _compat_scan(series, window_sizes, n_perm=n_perm, alpha_q=alpha_q, seed=seed, tol=tol, workers=workers, threshold=threshold, change_type="meanvar", eps=eps, b=b, taper_ratio=taper_ratio, batch_size=batch_size)

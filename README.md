@@ -1,17 +1,6 @@
 # SCAN Py
 
-SCAN Py is a Python package for **S**equential **C**hange-point **A**nalysis via **N**onparametric window screening. It exposes a research-friendly Python API backed by a Rust/PyO3 computation core.
-
-The package is designed around one normal entry point:
-
-```python
-from scan import scan_cpd
-
-result = scan_cpd(x)
-print(result.change_points)
-```
-
-Change points use Python split indexing: a returned value `t` denotes the split between `x[:t]` and `x[t:]`.
+SCAN Py is a Python package that is developed for change-point detection for **S**equential **C**hange-point **A**nalysis via **N**onparametric window screening. It exposes a research-friendly Python package backed by a Rust/PyO3 computation core. 
 
 ## Installation
 
@@ -269,15 +258,3 @@ from scan import f1_score_cpd, covering_metric, match_change_points, precision_r
 f1 = f1_score_cpd(true_cps, result.change_points, tolerance=10)
 covering = covering_metric(true_cps, result.change_points, n=len(y))
 ```
-
-## Compatibility Wrappers
-
-The previous wrappers remain available and return `(change_points, elapsed_seconds)`:
-
-```python
-from scan import scan_cpd_mean, scan_cpd_var, scan_cpd_meanvar
-
-cps, elapsed = scan_cpd_mean(y, window_sizes=[20, 30, 40])
-```
-
-New projects should prefer `scan_cpd()` because it returns diagnostics, thresholds, votes, and metadata.
