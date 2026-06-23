@@ -10,16 +10,6 @@ import numpy as np
 
 from .detector import scan_cpd
 
-BENCHMARK_CONFIG: list[tuple[int, int, int]] = [
-    (500, 4, 125),
-    (1000, 25, 67),
-    (5000, 42, 116),
-    (10000, 53, 188),
-    (20000, 67, 298),
-    (50000, 92, 537),
-    (100000, 116, 862),
-    (1000000, 250, 4000),
-]
 
 
 def simulate_time_series(
