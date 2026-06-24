@@ -1,5 +1,5 @@
 use crate::aggregate::{cdf_from_segment_votes, compute_change_points_with_votes};
-use crate::bootstrap::compute_bounds_tbb;
+use crate::bootstrap::compute_tapered_block_bootstrap_threshold;
 use crate::refine::refine_for_change_type;
 use crate::stats::PrefixStats;
 use crate::types::{ChangeType, ScanResult, WindowScanResult};
@@ -39,8 +39,7 @@ pub(crate) fn detect_for_window(
     let mut change_points = Vec::new();
     let mut starts = Vec::new();
     let mut statistics = Vec::new();
-    let mut lower_thresholds = Vec::new();
-    let mut upper_thresholds = Vec::new();
+    let mut tapered_block_bootstrap_threshold_values = Vec::new();
     let mut localized_regions = Vec::new();
 
     let mut start = 0usize;
@@ -48,7 +47,7 @@ pub(crate) fn detect_for_window(
         let block_end = start + w + delta_w;
         let block = &series[start..block_end];
 
-        let (lower, upper) = compute_bounds_tbb(
+        let tapered_block_bootstrap_threshold = compute_tapered_block_bootstrap_threshold(
             series,
             prefix,
             start,
@@ -68,10 +67,9 @@ pub(crate) fn detect_for_window(
 
         starts.push(start);
         statistics.push(observed);
-        lower_thresholds.push(lower);
-        upper_thresholds.push(upper);
+        tapered_block_bootstrap_threshold_values.push(tapered_block_bootstrap_threshold);
 
-        if observed > upper || observed < lower {
+        if observed > tapered_block_bootstrap_threshold {
             let k_loc = refine_for_change_type(block, change_type)?;
             let cp = (start + k_loc).clamp(start + 1, block_end - 1);
             change_points.push(cp);
@@ -91,8 +89,7 @@ pub(crate) fn detect_for_window(
             change_points,
             starts,
             statistics,
-            lower_thresholds,
-            upper_thresholds,
+            tapered_block_bootstrap_threshold: tapered_block_bootstrap_threshold_values,
             localized_regions,
         },
     ))

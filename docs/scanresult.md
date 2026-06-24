@@ -37,7 +37,7 @@ The `WindowResult` object contains the diagnostics from running SCAN at one spec
 | `change_points` | Candidate change-point locations detected using this single window size. | Helps inspect how one window size behaves before ensemble voting merges results across windows. |
 | `starts` | Starting indices of the scanned local regions. | Shows where the detector placed each adjacent-window comparison along the time series. |
 | `statistics` | Observed scan statistics computed at each scan start. | Useful for seeing where the local discrepancy between adjacent windows is large. |
-| `upper_thresholds` | Tapered  bootstrap thresholds for each scanned region. | Provides the upper rejection boundary; detections usually occur when the observed statistic exceeds this threshold. |
+| `tapered_block_bootstrap_threshold` | Tapered block bootstrap thresholds for each scanned region. | Provides the rejection threshold; detections occur when the observed statistic exceeds this threshold. |
 | `localized_regions` | Local `(start, end)` regions that were flagged and then refined into candidate change points. | Helps trace each detected candidate back to the region where localization was performed. |
 
 Per-window results are stored in `result.window_results`, which is indexed by window size. This allows users to inspect the candidate change points and diagnostics produced by each individual window size before the final voting or aggregation step. In the example below, `40` refers to the window size used during the scan.

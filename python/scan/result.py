@@ -1,4 +1,4 @@
-﻿"""Structured result objects for SCAN."""
+"""Structured result objects for SCAN."""
 
 from __future__ import annotations
 
@@ -14,8 +14,7 @@ class WindowResult:
     change_points: List[int]
     starts: List[int]
     statistics: List[float]
-    lower_thresholds: List[float]
-    upper_thresholds: List[float]
+    tapered_block_bootstrap_threshold: List[float]
     localized_regions: List[Tuple[int, int]]
 
     @classmethod
@@ -25,8 +24,9 @@ class WindowResult:
             change_points=[int(v) for v in raw.get("change_points", [])],
             starts=[int(v) for v in raw.get("starts", [])],
             statistics=[float(v) for v in raw.get("statistics", [])],
-            lower_thresholds=[float(v) for v in raw.get("lower_thresholds", [])],
-            upper_thresholds=[float(v) for v in raw.get("upper_thresholds", [])],
+            tapered_block_bootstrap_threshold=[
+                float(v) for v in raw.get("tapered_block_bootstrap_threshold", [])
+            ],
             localized_regions=[tuple(map(int, pair)) for pair in raw.get("localized_regions", [])],
         )
 
@@ -74,9 +74,8 @@ def scan_result_from_raw(
     thresholds = {
         w: {
             "starts": result.starts,
-            "lower": result.lower_thresholds,
-            "upper": result.upper_thresholds,
             "statistics": result.statistics,
+            "tapered_block_bootstrap_threshold": result.tapered_block_bootstrap_threshold,
         }
         for w, result in window_results.items()
     }

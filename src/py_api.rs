@@ -1,4 +1,4 @@
-﻿use crate::detect::{detect_for_window, run_scan_detector};
+use crate::detect::{detect_for_window, run_scan_detector};
 use crate::refine::{refine_cp_cusum, refine_cp_wasserstein, refine_for_change_type};
 use crate::stats::PrefixStats;
 use crate::types::{ChangeType, ScanResult, WindowScanResult};
@@ -13,8 +13,7 @@ fn window_result_to_py<'py>(py: Python<'py>, result: WindowScanResult) -> PyResu
     out.set_item("change_points", result.change_points)?;
     out.set_item("starts", result.starts)?;
     out.set_item("statistics", result.statistics)?;
-    out.set_item("lower_thresholds", result.lower_thresholds)?;
-    out.set_item("upper_thresholds", result.upper_thresholds)?;
+    out.set_item("tapered_block_bootstrap_threshold", result.tapered_block_bootstrap_threshold)?;
     out.set_item("localized_regions", result.localized_regions)?;
     Ok(out)
 }

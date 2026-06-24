@@ -141,10 +141,10 @@ def plot_thresholds(result: ScanResult, window_size: Optional[int] = None):
             continue
         starts = threshold_info["starts"]
         stats = threshold_info["statistics"]
-        upper = threshold_info["upper"]
-        for start, stat, bound in zip(starts, stats, upper):
+        thresholds = threshold_info["tapered_block_bootstrap_threshold"]
+        for start, stat, bound in zip(starts, stats, thresholds):
             rows.append({"window_size": str(w), "start": start, "value": stat, "series": "Observed"})
-            rows.append({"window_size": str(w), "start": start, "value": bound, "series": "Upper threshold"})
+            rows.append({"window_size": str(w), "start": start, "value": bound, "series": "Tapered block bootstrap threshold"})
 
     df = pd.DataFrame(rows, columns=["window_size", "start", "value", "series"])
     p = (

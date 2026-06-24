@@ -39,12 +39,10 @@ The following example simulates a univariate time series with multiple mean chan
 import numpy as np
 from scan import scan_cpd, simulate_time_series
 
-T = 20_000
-K = 67
-min_seg_len = 235
-seed = 500
-
-window_sizes = [104, 114, 115, 120, 123, 126, 133]
+T = 20_000 # Series length
+K = 67 # Number of change points
+min_seg_len = 235 # Minimum distance between two change points
+seed = 500 # For reproducibility of the results
 
 x, true_cps, means, sigmas = simulate_time_series(
     n=T,
@@ -53,6 +51,29 @@ x, true_cps, means, sigmas = simulate_time_series(
     change_type="mean",
     seed=seed,
 )
+```
+select window sizes required for the ensemble model. This can be done using the `choose_window_sizes` function. With 
+
+```python
+from scan import choose_window_sizes
+
+window_sizes = choose_window_sizes(
+    n=20_000,
+    n_windows=7,
+    seed=500,
+)
+
+```
+Output:
+
+```python
+print(window_sizes)
+
+[104, 114, 115, 120, 123, 126, 133]
+```
+Standerdize the series and then detect change-points using the `scan_cpd` function:
+
+```python
 
 x_std = (x - np.mean(x)) / np.std(x)
 
@@ -64,12 +85,11 @@ result = scan_cpd(
     vote_threshold=0.5,
     random_state=seed,
 ```
+The function returns a results object, change points can be accessed with the 
 
+Output:
 ```python
 print(result.change_points)
-```
-Output:
-```
 array([  287,   588,   889,  1185,  1474,  1763,  2057,  2360,  2652,
         2949,  3230,  3539,  3844,  4132,  4431,  4731,  5012,  5314,
         5607,  5895,  6180,  6450,  6663,  7050,  7342,  7643,  7926,
@@ -79,6 +99,7 @@ array([  287,   588,   889,  1185,  1474,  1763,  2057,  2360,  2652,
        16175, 16463, 16746, 17040, 17344, 17628, 17915, 18217, 18520,
        18817, 19112, 19424, 19712])
 ```
+
 
 ```python
 plot_change_points(x, result)
@@ -90,9 +111,13 @@ plot_change_points(x, result)
 More detailed documentation is available in the `docs/` folder. The README provides a short overview and a minimal example, while the documentation files give more complete guidance on installation, usage, outputs, and development.
 
 - [Home](README.mdmd): overview of the package and where to start.
-- [Documentation](docs/quickstart.md): a short end-to-end example showing how to simulate data, run `scan_cpd`, and inspect the detected change points.
+- [Documentation](docs/documentation.md): a short end-to-end example showing how to simulate data, run `scan_cpd`, and inspect the detected change points.
 - [Results](docs/scanresult.md): explanation of the `ScanResult` object returned by `scan_cpd`, including change points, scores, votes, thresholds, diagnostics, parameters, and metadata.
 - [Examples](docs/examples.md): additional examples for different types of change-point detection workflows.
 - [Development](docs/development.md): notes for contributors, including local builds, tests, formatting checks, and package release checks.
 
 A runnable tutorial notebook is also available at [example-usage.ipynb](example-usage.ipynb).
+
+## Citation
+
+Include the citation to the paper here

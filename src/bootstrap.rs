@@ -156,9 +156,9 @@ pub(crate) fn batched_tbb_distances(
     Ok(dists)
 }
 
-/// Compute the local bootstrap lower/upper detection bounds for one window pair.
+/// Compute the local tapered block bootstrap detection threshold for one window pair.
 #[allow(clippy::too_many_arguments)]
-pub(crate) fn compute_bounds_tbb(
+pub(crate) fn compute_tapered_block_bootstrap_threshold(
     series: &[f64],
     prefix: &PrefixStats,
     start: usize,
@@ -172,7 +172,7 @@ pub(crate) fn compute_bounds_tbb(
     center: bool,
     eps: f64,
     batch_size: usize,
-) -> PyResult<(f64, f64)> {
+) -> PyResult<f64> {
     if delta != w {
         return Err(PyValueError::new_err(
             "this implementation assumes delta == w",
@@ -181,7 +181,7 @@ pub(crate) fn compute_bounds_tbb(
 
     let total_len = w + delta;
     if start + total_len > series.len() {
-        return Ok((f64::NEG_INFINITY, f64::INFINITY));
+        return Ok(f64::INFINITY);
     }
 
     let left_start = start;
@@ -244,6 +244,5 @@ pub(crate) fn compute_bounds_tbb(
         *value *= local_scale;
     }
 
-    let upper = percentile_linear(&mut dists, 100.0 - q_percent);
-    Ok((0.0, upper))
+    Ok(percentile_linear(&mut dists, 100.0 - q_percent))
 }

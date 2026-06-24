@@ -1,4 +1,4 @@
-﻿use pyo3::exceptions::PyValueError;
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use std::collections::BTreeMap;
 
@@ -37,8 +37,7 @@ pub(crate) struct WindowScanResult {
     pub(crate) change_points: Vec<usize>,
     pub(crate) starts: Vec<usize>,
     pub(crate) statistics: Vec<f64>,
-    pub(crate) lower_thresholds: Vec<f64>,
-    pub(crate) upper_thresholds: Vec<f64>,
+    pub(crate) tapered_block_bootstrap_threshold: Vec<f64>,
     pub(crate) localized_regions: Vec<(usize, usize)>,
 }
 
