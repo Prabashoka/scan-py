@@ -27,6 +27,9 @@ classifiers = [
 test = [
     "pytest>=8",
 ]
+simulation = [
+    "statsmodels>=0.13",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

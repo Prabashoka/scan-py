@@ -15,7 +15,7 @@ result = scan_cpd(
     alpha=0.05,
     n_boot=100,
     vote_threshold=0.5,
-    n_jobs=4,
+    n_jobs=None,
     random_state=123,
 )
 

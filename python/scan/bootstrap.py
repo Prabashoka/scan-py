@@ -1,6 +1,4 @@
-﻿"""Bootstrap utilities for research experiments."""
-
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Iterable, Optional
 

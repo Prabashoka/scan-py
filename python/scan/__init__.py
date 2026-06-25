@@ -15,6 +15,7 @@ from .plotting import (
 )
 from .result import ScanResult, WindowResult
 from .simulator import (
+    UnivariateSeriesSimulator,
     choose_window_sizes,
     run_one_benchmark,
     safe_min_seg_len,
@@ -22,9 +23,9 @@ from .simulator import (
 )
 from .statistics import (
     ipm_statistic,
-    localize_cp,
     refine_cusum,
     refine_wasserstein,
+    swal_statistic,
     wasserstein_statistic,
 )
 
@@ -32,6 +33,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "ScanResult",
+    "UnivariateSeriesSimulator",
     "WindowResult",
     "adaptive_threshold",
     "choose_window_sizes",
@@ -39,7 +41,6 @@ __all__ = [
     "ensemble_vote",
     "f1_score_cpd",
     "ipm_statistic",
-    "localize_cp",
     "match_change_points",
     "merge_change_points",
     "plot_change_points",
@@ -53,11 +54,9 @@ __all__ = [
     "run_one_benchmark",
     "safe_min_seg_len",
     "scan_cpd",
-    "scan_cpd_mean",
-    "scan_cpd_meanvar",
-    "scan_cpd_var",
     "scan_single_window",
     "simulate_time_series",
+    "swal_statistic",
     "tapered_block_bootstrap",
     "wasserstein_statistic",
 ]

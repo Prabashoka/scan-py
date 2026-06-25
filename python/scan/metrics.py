@@ -1,8 +1,4 @@
-﻿"""Evaluation metrics for change-point detection."""
-
-from __future__ import annotations
-
-from typing import Iterable, List, Tuple
+﻿from typing import Iterable, List, Tuple
 
 
 def _clean_cps(cps: Iterable[int]) -> List[int]:

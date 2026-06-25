@@ -1,7 +1,4 @@
-﻿"""Public detector API for SCAN."""
-
-from __future__ import annotations
-
+import os
 import time
 from typing import Iterable, List, Optional, Sequence
 
@@ -9,6 +6,8 @@ import numpy as np
 
 from . import _scan_rust
 from .result import ScanResult, WindowResult, scan_result_from_raw
+
+_ALLOWED_CHANGE_TYPES = {"mean", "var", "distribution"}
 
 
 def _as_float_list(x: Iterable[float]) -> List[float]:
@@ -45,18 +44,23 @@ def _default_window_sizes(n: int, min_window: int, max_window: Optional[int]) ->
     return _as_window_list(np.linspace(min_window, upper, n_grid, dtype=int))
 
 
+def _validate_change_type(value: str) -> str:
+    normalized = str(value).lower()
+    if normalized not in _ALLOWED_CHANGE_TYPES:
+        raise ValueError("change_type must be one of {'mean', 'var', 'distribution'}")
+    return normalized
+
+
 def _change_type_from_ipm(ipm: str, change_type: Optional[str]) -> str:
     if change_type is not None:
-        return str(change_type).lower()
+        return _validate_change_type(change_type)
 
     value = str(ipm).lower()
-    if value in {"mean", "cusum"}:
-        return "mean"
-    if value in {"var", "variance"}:
-        return "var"
-    if value in {"wasserstein", "meanvar", "distribution", "ipm"}:
-        return "meanvar"
-    raise ValueError("ipm must be one of {'wasserstein', 'mean', 'var', 'meanvar'}")
+    if value in _ALLOWED_CHANGE_TYPES:
+        return value
+    if value in {"wasserstein", "ipm"}:
+        return "distribution"
+    raise ValueError("ipm must be one of {'wasserstein', 'mean', 'var', 'distribution'}")
 
 
 def _normalize_alpha(alpha: float) -> float:
@@ -75,6 +79,21 @@ def _normalize_taper(taper: str) -> float:
     raise ValueError("taper must be one of {'tukey', 'none'}")
 
 
+def _resolve_n_jobs(n_jobs: Optional[int]) -> tuple[Optional[int], int, int]:
+    cpu_count = os.cpu_count() or 1
+
+    if n_jobs is None:
+        return None, max(1, cpu_count - 1), cpu_count
+
+    requested = int(n_jobs)
+    if requested == -1:
+        return requested, cpu_count, cpu_count
+    if requested < 1:
+        raise ValueError("n_jobs must be None, -1, or a positive integer")
+
+    return requested, min(requested, cpu_count), cpu_count
+
+
 def scan_cpd(
     x: Iterable[float],
     window_sizes: Optional[Sequence[int]] = None,
@@ -89,7 +108,7 @@ def scan_cpd(
     ipm: str = "wasserstein",
     tolerance: Optional[int] = None,
     random_state: Optional[int] = None,
-    n_jobs: Optional[int] = 1,
+    n_jobs: Optional[int] = None,
     return_all: bool = True,
     *,
     change_type: Optional[str] = None,
@@ -128,6 +147,7 @@ def scan_cpd(
     seed = 0 if random_state is None else int(random_state)
     rust_change_type = _change_type_from_ipm(ipm, change_type)
     taper_ratio = _normalize_taper(taper)
+    requested_n_jobs, resolved_n_jobs, cpu_count = _resolve_n_jobs(n_jobs)
 
     parameters = {
         "window_sizes": windows,
@@ -143,7 +163,7 @@ def scan_cpd(
         "change_type": rust_change_type,
         "tolerance": tol,
         "random_state": random_state,
-        "n_jobs": n_jobs,
+        "n_jobs": requested_n_jobs,
         "return_all": return_all,
         "eps": eps,
         "batch_size": batch_size,
@@ -157,7 +177,7 @@ def scan_cpd(
         alpha,
         seed,
         tol,
-        None if n_jobs is None else int(n_jobs),
+        resolved_n_jobs,
         "thread",
         rust_change_type,
         float(eps),
@@ -173,6 +193,8 @@ def scan_cpd(
         "elapsed_seconds": elapsed,
         "index_base": "python_split_0_based",
         "rust_backend": "scan._scan_rust",
+        "cpu_count": cpu_count,
+        "resolved_n_jobs": resolved_n_jobs,
     }
 
     result = scan_result_from_raw(
@@ -233,4 +255,3 @@ def scan_single_window(
         int(batch_size),
     )
     return WindowResult.from_raw(window_size, raw)
-

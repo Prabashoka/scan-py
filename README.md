@@ -27,7 +27,7 @@ Supported change types include:
 | `change_type` | Explanation |
 |---|---|
 | `"mean"` | Detects changes mainly in the location or average level of the series. |
-| `"variance"` | Detects changes mainly in the variability or scale of the series. |
+| `"var"` | Detects changes mainly in the variability or scale of the series. |
 | `"distribution"` | Detects broader distributional changes, not restricted to only mean or variance shifts (includes both mean and variance together). |
 
 ### Example usage
@@ -58,7 +58,7 @@ select window sizes required for the ensemble model. This can be done using the 
 from scan import choose_window_sizes
 
 window_sizes = choose_window_sizes(
-    n=20_000,
+    series_length=200_000,
     n_windows=7,
     seed=500,
 )
@@ -71,6 +71,7 @@ print(window_sizes)
 
 [104, 114, 115, 120, 123, 126, 133]
 ```
+#### Detecting change-points
 Standerdize the series and then detect change-points using the `scan_cpd` function:
 
 ```python
@@ -81,9 +82,11 @@ result = scan_cpd(
     x_std,
     window_sizes=window_sizes,
     n_boot=400,
-    alpha=1,
+    alpha=5, # significance level
     vote_threshold=0.5,
     random_state=seed,
+    n_jobs=None,  # automatically uses one fewer than the available CPU cores
+)
 ```
 The function returns a results object, change points can be accessed with the 
 
@@ -100,12 +103,55 @@ array([  287,   588,   889,  1185,  1474,  1763,  2057,  2360,  2652,
        18817, 19112, 19424, 19712])
 ```
 
+#### Visualizing
+
+**Visualizing the detected change-points**
+The detected change points can also be visualized using `plot_change_points`. The function returns a `plotnine` plot object showing the time series as a dark blue line and the detected change points as vertical dashed orange lines.
 
 ```python
 plot_change_points(x, result)
 ```
+![Detected change points](plots/change_points.png)
+To save the plot as an image:
+```python
+plot = plot_change_points(x, result)
+plot.save("plots/change_points.png", width=12, height=4.5, dpi=300)
+```
 
+**Determine vote threshold using the scree plot**
 
+The voting scree plot helps inspect how many candidate change points are retained as the ensemble voting threshold changes. It is useful for choosing a sensible `vote_threshold` before finalizing the detected change points.
+
+```python
+from scan import plot_vote_scree
+plot_vote_scree(result)
+```
+The x-axis shows the voting threshold, denoted by ν, and the y-axis shows the number of retained change points at each threshold. A lower threshold keeps more candidate change points, while a higher threshold keeps only candidates supported by more window sizes.
+In practice, choose a value near the point where the curve begins to flatten. This avoids keeping many weak detections while preserving stable change points that are supported across multiple window sizes.
+
+![Majority voting scree plot](plots/vote_scree.png)
+
+## SWAL statistic
+
+```python
+import numpy as np
+from scan import swal_statistic
+
+rng = np.random.default_rng(123)
+
+x_region = np.r_[
+    rng.normal(0.0, 1.0, 80),
+    rng.normal(2.0, 1.0, 80),
+]
+
+local_cp = swal_statistic(x_region, change_type="mean")
+
+print(local_cp)
+```
+
+```python
+plot_swal_curve(x)
+```
 ## Documentation
 
 More detailed documentation is available in the `docs/` folder. The README provides a short overview and a minimal example, while the documentation files give more complete guidance on installation, usage, outputs, and development.

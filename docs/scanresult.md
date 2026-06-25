@@ -12,7 +12,7 @@ The `scan_cpd` function returns a `ScanResult` object. This object collects the 
 | `per_window_diagnostics` | Diagnostic information from each individual window size. | Helps inspect which window sizes contributed to each detection. |
 | `thresholds` | Bootstrap or calibration thresholds used during detection. | Important for reproducibility and for understanding the rejection rule. |
 | `parameters` | The parameter values used in the call to `scan_cpd`, such as `window_sizes`, `alpha`, `n_boot`, and `vote_threshold`. | Makes the result self-contained and easier to reproduce. |
-| `metadata` | Additional run information, such as package version, runtime information, random seed, or backend details. | Useful for experiments, reporting, debugging, and reproducibility. |
+| `metadata` | Additional run information, such as runtime, backend details, `cpu_count`, and `resolved_n_jobs`. | Useful for experiments, reporting, debugging, and reproducibility, especially when `n_jobs=None` chooses workers automatically. |
 | `raw_backend_output` | Raw output returned by the Rust/PyO3 backend before post-processing. | Mainly useful for advanced users, debugging, or development. |
 
 The object returned by `scan_cpd` stores the main outputs of the detection procedure as attributes. Each attribute can be accessed using the dot operator (`.`), which makes it easy to inspect the detected change points, detection scores, voting information, run parameters, metadata, and per-window results.
@@ -25,6 +25,14 @@ print(result.votes)
 print(result.parameters)
 print(result.metadata)
 print(result.cp_dict)
+```
+
+Worker selection is also recorded in the result metadata:
+
+```python
+print(result.parameters["n_jobs"])        # requested value, often None for automatic
+print(result.metadata["cpu_count"])       # CPU count seen by Python
+print(result.metadata["resolved_n_jobs"]) # worker count passed to the Rust backend
 ```
 
 ## `WindowResult`

@@ -7,17 +7,17 @@ use std::collections::BTreeMap;
 pub(crate) enum ChangeType {
     Mean,
     Var,
-    MeanVar,
+    Distribution,
 }
 
 impl ChangeType {
     pub(crate) fn parse(value: &str) -> PyResult<Self> {
         match value.to_ascii_lowercase().as_str() {
             "mean" => Ok(Self::Mean),
-            "var" | "variance" => Ok(Self::Var),
-            "meanvar" | "distribution" | "wasserstein" => Ok(Self::MeanVar),
+            "var" => Ok(Self::Var),
+            "distribution" => Ok(Self::Distribution),
             other => Err(PyValueError::new_err(format!(
-                "change_type must be one of {{'mean', 'var', 'meanvar'}}, got {other:?}"
+                "change_type must be one of {{'mean', 'var', 'distribution'}}, got {other:?}"
             ))),
         }
     }

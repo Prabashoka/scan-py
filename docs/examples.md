@@ -57,7 +57,7 @@ result = scan_cpd(
     alpha=1,
     vote_threshold=0.7,
     random_state=seed,
-    n_jobs=8,
+    n_jobs=None,  # automatically uses one fewer than the available CPU cores
     change_type="mean",
     batch_size=32,
 )

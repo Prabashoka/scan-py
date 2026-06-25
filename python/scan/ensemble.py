@@ -1,8 +1,4 @@
-﻿"""Ensemble aggregation helpers for candidate change-points."""
-
-from __future__ import annotations
-
-from collections import Counter
+﻿from collections import Counter
 from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 

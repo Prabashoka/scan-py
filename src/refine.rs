@@ -57,6 +57,6 @@ pub(crate) fn refine_cp_wasserstein(y: &[f64]) -> PyResult<(usize, Vec<f64>)> {
 pub(crate) fn refine_for_change_type(block: &[f64], change_type: ChangeType) -> PyResult<usize> {
     match change_type {
         ChangeType::Mean => refine_cp_cusum(block),
-        ChangeType::Var | ChangeType::MeanVar => refine_cp_wasserstein(block).map(|(k, _)| k),
+        ChangeType::Var | ChangeType::Distribution => refine_cp_wasserstein(block).map(|(k, _)| k),
     }
 }
