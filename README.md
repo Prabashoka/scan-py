@@ -36,15 +36,12 @@ The following example simulates a univariate time series with multiple mean chan
 
 
 ```python
-import numpy as np
-from scan import scan_cpd, simulate_time_series
+T = 200_000 # Length of the time series
+K = 100 # Number of change-points
+min_seg_len = 1000 # Minimum distance between two change-points
+seed = 2000 # Seed for reproducibility
 
-T = 20_000 # Series length
-K = 67 # Number of change points
-min_seg_len = 235 # Minimum distance between two change points
-seed = 500 # For reproducibility of the results
-
-x, true_cps, means, sigmas = simulate_time_series(
+x, true_cps, _, _ = simulate_time_series(
     n=T,
     n_cps=K,
     min_seg_len=min_seg_len,
@@ -69,7 +66,7 @@ Output:
 ```python
 print(window_sizes)
 
-[104, 114, 115, 120, 123, 126, 133]
+[134, 225, 241, 294, 323, 325, 394]
 ```
 #### Detecting change-points
 Standerdize the series and then detect change-points using the `scan_cpd` function:
@@ -84,7 +81,7 @@ result = scan_cpd(
     n_boot=400,
     alpha=5, # significance level
     vote_threshold=0.5,
-    random_state=seed,
+    random_state=1000, # for reproducibility of the tapred block bootstrap
     n_jobs=None,  # automatically uses one fewer than the available CPU cores
 )
 ```
@@ -93,14 +90,6 @@ The function returns a results object, change points can be accessed with the
 Output:
 ```python
 print(result.change_points)
-array([  287,   588,   889,  1185,  1474,  1763,  2057,  2360,  2652,
-        2949,  3230,  3539,  3844,  4132,  4431,  4731,  5012,  5314,
-        5607,  5895,  6180,  6450,  6663,  7050,  7342,  7643,  7926,
-        8211,  8505,  8804,  9085,  9377,  9662,  9976, 10269, 10579,
-       10861, 11151, 11456, 11740, 12018, 12315, 12622, 12904, 13198,
-       13503, 13801, 14101, 14390, 14684, 14976, 15272, 15572, 15886,
-       16175, 16463, 16746, 17040, 17344, 17628, 17915, 18217, 18520,
-       18817, 19112, 19424, 19712])
 ```
 
 #### Visualizing
@@ -131,7 +120,15 @@ In practice, choose a value near the point where the curve begins to flatten. Th
 
 ![Majority voting scree plot](plots/vote_scree.png)
 
-## SWAL statistic
+### SWAL Statistic
+
+The `swal_statistic` function is a single change-point detection tool for univariate time series. It is useful after a suspicious local region has been identified and you want to estimate the most likely split point inside that region. Additionally, this can be used as a custom cost function with other change-point detction methods such as bianr segmentation, PELT.
+
+It can be used for changes in:
+
+See the following usage examples for changes in mean and general distributional shifts.
+
+**Change in mean**
 
 ```python
 import numpy as np
@@ -139,19 +136,64 @@ from scan import swal_statistic
 
 rng = np.random.default_rng(123)
 
+# Simulate a time seires with a single change in mean
 x_region = np.r_[
     rng.normal(0.0, 1.0, 80),
     rng.normal(2.0, 1.0, 80),
 ]
 
-local_cp = swal_statistic(x_region, change_type="mean")
+local_cp = swal_statistic(x_region)
 
 print(local_cp)
 ```
 
 ```python
-plot_swal_curve(x)
+time_series_plot = plot_time_series(
+    x_region,
+    y_label="Value",
+    title="Local time series",
+)
+
+swal_curve_plot = plot_swal_curve(
+    x_region,
+    start=0,
+    end=len(x_region),
+)
 ```
+
+<p align="center">
+  <img src="plots/local_time_series.png" width="48%">
+  <img src="plots/swal_curve.png" width="48%">
+</p>
+
+**Change in distribution**
+
+```python
+import numpy as np
+from scan import swal_statistic, plot_time_series, plot_swal_curve
+
+rng = np.random.default_rng(123)
+
+# Distributional change:
+# first segment is standard normal,
+# second segment is centered exponential.
+x_region = np.r_[
+    rng.normal(0.0, 1.0, 100),
+    rng.exponential(scale=1.0, size=100) - 1.0,
+]
+
+local_cp = swal_statistic(
+    x_region,
+)
+
+print(local_cp)
+```
+<p align="center">
+  <img src="plots/distribution_change_time_series.png" width="48%">
+  <img src="plots/distribution_change_swal_curve.png" width="48%">
+</p>
+
+
 ## Documentation
 
 More detailed documentation is available in the `docs/` folder. The README provides a short overview and a minimal example, while the documentation files give more complete guidance on installation, usage, outputs, and development.
