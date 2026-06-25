@@ -10,6 +10,7 @@ from .plotting import (
     plot_change_points,
     plot_swal_curve,
     plot_thresholds,
+    plot_time_series,
     plot_vote_scree,
     plot_window_votes,
 )
@@ -46,6 +47,7 @@ __all__ = [
     "plot_change_points",
     "plot_swal_curve",
     "plot_thresholds",
+    "plot_time_series",
     "plot_vote_scree",
     "plot_window_votes",
     "precision_recall_cpd",

@@ -20,7 +20,7 @@ from plotnine import (
     scale_linetype_manual,
     scale_x_continuous,
     theme,
-    theme_minimal
+    theme_minimal,
 )
 
 from .result import ScanResult
@@ -69,6 +69,114 @@ def _scan_plot_theme(legend_position="none"):
         legend_background=element_blank(),
         legend_box_background=element_blank(),
     )
+
+def plot_time_series(
+    x: Iterable[float],
+    change_points: Optional[Iterable[int]] = None,
+    true_change_points: Optional[Iterable[int]] = None,
+    index: Optional[Iterable[float]] = None,
+    x_label: str = "Time",
+    y_label: str = "Value",
+    title: str = "Time series",
+):
+    """Plot a univariate time series with optional change-point markers."""
+    y = np.asarray(x, dtype=np.float64).ravel()
+
+    if index is None and hasattr(x, "index"):
+        t = np.asarray(x.index)
+    elif index is None:
+        t = np.arange(y.size)
+    else:
+        t = np.asarray(list(index))
+
+    if len(t) != y.size:
+        raise ValueError("index must have the same length as x")
+
+    def _map_cps_to_axis(cps):
+        if cps is None:
+            return []
+
+        mapped = []
+        for cp in cps:
+            cp_int = int(cp)
+            if 0 <= cp_int < len(t):
+                mapped.append(t[cp_int])
+            else:
+                mapped.append(cp)
+        return mapped
+
+    df = pd.DataFrame(
+        {
+            "t": t,
+            "value": y,
+        }
+    )
+
+    detected_df = pd.DataFrame(
+        {
+            "cp": _map_cps_to_axis(change_points),
+            "kind": "Detected change points",
+        }
+    )
+
+    true_cp_df = pd.DataFrame(columns=["cp", "kind"])
+    if true_change_points is not None:
+        true_cp_df = pd.DataFrame(
+            {
+                "cp": _map_cps_to_axis(true_change_points),
+                "kind": "True change points",
+            }
+        )
+
+    p = (
+        ggplot(df, aes("t", "value"))
+        + geom_line(color="#00008B", size=0.9, show_legend=False)
+        + labs(
+            x=x_label,
+            y=y_label,
+            color=None,
+            linetype=None,
+            title=title,
+        )
+        + _scan_plot_theme(legend_position="bottom")
+    )
+
+    if not detected_df.empty:
+        p = p + geom_vline(
+            detected_df,
+            aes(xintercept="cp", color="kind", linetype="kind"),
+            size=0.7,
+            alpha=0.9,
+        )
+
+    if not true_cp_df.empty:
+        p = p + geom_vline(
+            true_cp_df,
+            aes(xintercept="cp", color="kind", linetype="kind"),
+            size=0.7,
+            alpha=0.85,
+        )
+
+    p = (
+        p
+        + scale_color_manual(
+            values={
+                "Detected change points": "#f5710a",
+                "True change points": "black",
+            }
+        )
+        + scale_linetype_manual(
+            values={
+                "Detected change points": "dashed",
+                "True change points": "dotted",
+            }
+        )
+    )
+
+    if np.issubdtype(np.asarray(t).dtype, np.number):
+        p = p + scale_x_continuous(labels=_comma_labels)
+
+    return p
 
 
 def plot_change_points(
