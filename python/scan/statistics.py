@@ -40,7 +40,17 @@ def swal_statistic(x: Iterable[float], change_type: str = "distribution") -> int
     arr = _as_float_list(x)
     if len(arr) < 3:
         raise ValueError("x must contain at least 3 observations")
-    return int(_scan_rust.swal_statistic(arr, _validate_change_type(change_type)))
+
+    change_type = _validate_change_type(change_type)
+    backend_swal = getattr(_scan_rust, "swal_statistic", None)
+    if backend_swal is not None:
+        return int(backend_swal(arr, change_type))
+
+    if change_type == "mean":
+        return int(_scan_rust.refine_cusum(arr))
+
+    cp, _ = _scan_rust.refine_wasserstein(arr)
+    return int(cp)
 
 
 def refine_cusum(x: Iterable[float]) -> int:
