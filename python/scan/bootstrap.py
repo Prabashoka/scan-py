@@ -1,4 +1,11 @@
-﻿from __future__ import annotations
+"""Bootstrap utilities for local SCAN threshold estimation.
+
+This module provides a tapered block bootstrap implementation for dependent
+time series and a convenience helper for estimating adaptive Wasserstein
+thresholds between two adjacent windows.
+"""
+
+from __future__ import annotations
 
 from typing import Iterable, Optional
 
@@ -8,6 +15,7 @@ from .statistics import wasserstein_statistic
 
 
 def _taper_window(length: int, taper: str = "tukey") -> np.ndarray:
+    """Return multiplicative taper weights for one bootstrap block."""
     if length <= 0:
         raise ValueError("length must be positive")
     value = taper.lower()
@@ -26,7 +34,31 @@ def tapered_block_bootstrap(
     taper: str = "tukey",
     random_state: Optional[int] = None,
 ) -> np.ndarray:
-    """Generate tapered block bootstrap samples."""
+    """Generate tapered block bootstrap samples.
+
+    Parameters
+    ----------
+    x:
+        One-dimensional source series used to draw overlapping blocks.
+    sample_length:
+        Number of observations in each bootstrap replicate.
+    block_length:
+        Length of each sampled block. When omitted, uses ``n ** (1 / 3)`` with
+        a minimum of 3 observations.
+    n_boot:
+        Number of bootstrap replicates to generate.
+    taper:
+        Taper shape. Use ``"tukey"`` for Hann-style tapering or ``"none"`` for
+        rectangular blocks.
+    random_state:
+        Optional NumPy random seed for reproducible sampling.
+
+    Returns
+    -------
+    numpy.ndarray
+        Array with shape ``(n_boot, sample_length)`` containing bootstrap
+        replicates.
+    """
     arr = np.asarray(x, dtype=np.float64).ravel()
     if arr.size == 0:
         raise ValueError("x must be non-empty")
@@ -41,6 +73,9 @@ def tapered_block_bootstrap(
     block_length = int(block_length or max(3, round(arr.size ** (1 / 3))))
     block_length = min(block_length, arr.size)
     starts = np.arange(0, arr.size - block_length + 1)
+
+    # Rescale taper weights so each tapered block has comparable energy to an
+    # untapered block of the same length.
     weights = _taper_window(block_length, taper=taper)
     weights = weights * (block_length**0.5 / np.sqrt(np.sum(weights**2)))
 
@@ -66,7 +101,32 @@ def adaptive_threshold(
     taper: str = "tukey",
     random_state: Optional[int] = None,
 ) -> float:
-    """Compute a local bootstrap threshold for a two-window comparison."""
+    """Compute a local bootstrap threshold for a two-window comparison.
+
+    The two windows are mean-centered and pooled before bootstrapping so the
+    null distribution represents no local distributional change.
+
+    Parameters
+    ----------
+    left, right:
+        Adjacent samples to compare.
+    alpha:
+        Upper-tail probability for the returned threshold.
+    n_boot:
+        Number of bootstrap samples used to approximate the null distribution.
+    block_length:
+        Optional bootstrap block length.
+    taper:
+        Taper shape passed to :func:`tapered_block_bootstrap`.
+    random_state:
+        Optional NumPy random seed.
+
+    Returns
+    -------
+    float
+        Empirical ``1 - alpha`` quantile of bootstrapped Wasserstein
+        statistics.
+    """
     left_arr = np.asarray(left, dtype=np.float64).ravel()
     right_arr = np.asarray(right, dtype=np.float64).ravel()
     if left_arr.size == 0 or right_arr.size == 0:

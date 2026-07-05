@@ -1,4 +1,6 @@
-﻿import numpy as np
+"""Minimal example showing SCAN detection and plotting on synthetic data."""
+
+import numpy as np
 
 from scan import plot_change_points, scan_cpd
 

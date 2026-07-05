@@ -1,0 +1,786 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scan-py documentation &mdash; scan-py 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            scan-py
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">scan-py documentation</a></li>
+<li><a class="reference internal" href="#scan">SCAN</a><ul>
+<li><a class="reference internal" href="#scan.detector.scan_cpd"><code class="docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a></li>
+<li><a class="reference internal" href="#scan.detector.scan_single_window"><code class="docutils literal notranslate"><span class="pre">scan_single_window()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plotting">Plotting</a><ul>
+<li><a class="reference internal" href="#scan.plotting.plot_time_series"><code class="docutils literal notranslate"><span class="pre">plot_time_series()</span></code></a></li>
+<li><a class="reference internal" href="#scan.plotting.plot_change_points"><code class="docutils literal notranslate"><span class="pre">plot_change_points()</span></code></a></li>
+<li><a class="reference internal" href="#scan.plotting.plot_swal_curve"><code class="docutils literal notranslate"><span class="pre">plot_swal_curve()</span></code></a></li>
+<li><a class="reference internal" href="#scan.plotting.plot_vote_scree"><code class="docutils literal notranslate"><span class="pre">plot_vote_scree()</span></code></a></li>
+<li><a class="reference internal" href="#scan.plotting.plot_window_votes"><code class="docutils literal notranslate"><span class="pre">plot_window_votes()</span></code></a></li>
+<li><a class="reference internal" href="#scan.plotting.plot_thresholds"><code class="docutils literal notranslate"><span class="pre">plot_thresholds()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#evaluation-metrics">Evaluation Metrics</a><ul>
+<li><a class="reference internal" href="#scan.metrics.covering_metric"><code class="docutils literal notranslate"><span class="pre">covering_metric()</span></code></a></li>
+<li><a class="reference internal" href="#scan.metrics.precision_recall_cpd"><code class="docutils literal notranslate"><span class="pre">precision_recall_cpd()</span></code></a></li>
+<li><a class="reference internal" href="#scan.metrics.f1_score_cpd"><code class="docutils literal notranslate"><span class="pre">f1_score_cpd()</span></code></a></li>
+<li><a class="reference internal" href="#scan.metrics.match_change_points"><code class="docutils literal notranslate"><span class="pre">match_change_points()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#univariate-simulator">Univariate Simulator</a><ul>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator</span></code></a><ul>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.apply_random_shifts"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.apply_random_shifts()</span></code></a></li>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.arfima_sim"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.arfima_sim()</span></code></a></li>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.determine_change_points"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.determine_change_points()</span></code></a></li>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.fracint_weights"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.fracint_weights()</span></code></a></li>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.select_change_point_locations"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.select_change_point_locations()</span></code></a></li>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.simulate_ar_series"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.simulate_ar_series()</span></code></a></li>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.simulate_ar_unif"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.simulate_ar_unif()</span></code></a></li>
+<li><a class="reference internal" href="#scan.simulator.UnivariateSeriesSimulator.simulate_arma"><code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator.simulate_arma()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#scan.simulator.simulate_time_series"><code class="docutils literal notranslate"><span class="pre">simulate_time_series()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utils">Utils</a><ul>
+<li><a class="reference internal" href="#scan.simulator.choose_window_sizes"><code class="docutils literal notranslate"><span class="pre">choose_window_sizes()</span></code></a></li>
+<li><a class="reference internal" href="#scan.ensemble.ensemble_vote"><code class="docutils literal notranslate"><span class="pre">ensemble_vote()</span></code></a></li>
+<li><a class="reference internal" href="#scan.ensemble.merge_change_points"><code class="docutils literal notranslate"><span class="pre">merge_change_points()</span></code></a></li>
+<li><a class="reference internal" href="#scan.bootstrap.adaptive_threshold"><code class="docutils literal notranslate"><span class="pre">adaptive_threshold()</span></code></a></li>
+<li><a class="reference internal" href="#scan.bootstrap.tapered_block_bootstrap"><code class="docutils literal notranslate"><span class="pre">tapered_block_bootstrap()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">scan-py</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">scan-py documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="scan-py-documentation">
+<h1>scan-py documentation<a class="headerlink" href="#scan-py-documentation" title="Link to this heading"></a></h1>
+<p>API reference for the main SCAN change-point detection workflow, grouped by
+how the package is commonly used.</p>
+</section>
+<section id="scan">
+<h1>SCAN<a class="headerlink" href="#scan" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.detector.scan_cpd">
+<span class="sig-prename descclassname"><span class="pre">scan.detector.</span></span><span class="sig-name descname"><span class="pre">scan_cpd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_length_rule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'n^(1/3)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tukey'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ipm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'wasserstein'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ScanResult</span></span></span><a class="headerlink" href="#scan.detector.scan_cpd" title="Link to this definition"></a></dt>
+<dd><p>Run SCAN / Ensemble SCAN and return a structured result.</p>
+<p>Change points use Python split indexing: a returned value <code class="docutils literal notranslate"><span class="pre">t</span></code> denotes the
+split between <code class="docutils literal notranslate"><span class="pre">x[:t]</span></code> and <code class="docutils literal notranslate"><span class="pre">x[t:]</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – One-dimensional numeric series to scan.</p></li>
+<li><p><strong>window_sizes</strong> – Candidate half-window sizes. If omitted, a small grid is derived from
+<code class="docutils literal notranslate"><span class="pre">min_window</span></code> and <code class="docutils literal notranslate"><span class="pre">max_window</span></code>.</p></li>
+<li><p><strong>alpha</strong> – Bootstrap significance level used by each local scan.</p></li>
+<li><p><strong>n_boot</strong> – Number of tapered block bootstrap draws per local comparison.</p></li>
+<li><p><strong>vote_threshold</strong> – Minimum ensemble vote score required to retain a candidate change
+point.</p></li>
+<li><p><strong>min_window</strong> – Bounds used only when <code class="docutils literal notranslate"><span class="pre">window_sizes</span></code> is omitted.</p></li>
+<li><p><strong>max_window</strong> – Bounds used only when <code class="docutils literal notranslate"><span class="pre">window_sizes</span></code> is omitted.</p></li>
+<li><p><strong>block_length</strong> – Optional bootstrap block length. If omitted, the backend applies the
+selected <code class="docutils literal notranslate"><span class="pre">block_length_rule</span></code>.</p></li>
+<li><p><strong>block_length_rule</strong> – Rule for automatic block lengths. Currently only <code class="docutils literal notranslate"><span class="pre">&quot;n^(1/3)&quot;</span></code> is
+supported by this wrapper.</p></li>
+<li><p><strong>taper</strong> – Taper applied to bootstrap blocks. Supported values are <code class="docutils literal notranslate"><span class="pre">&quot;tukey&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>.</p></li>
+<li><p><strong>ipm</strong> – Legacy discrepancy selector. <code class="docutils literal notranslate"><span class="pre">&quot;wasserstein&quot;</span></code> maps to distributional
+change detection.</p></li>
+<li><p><strong>tolerance</strong> – Maximum distance for grouping nearby candidates during ensemble voting.</p></li>
+<li><p><strong>random_state</strong> – Optional random seed passed to the Rust backend.</p></li>
+<li><p><strong>n_jobs</strong> – Number of worker threads. Use <code class="docutils literal notranslate"><span class="pre">-1</span></code> for all available CPUs.</p></li>
+<li><p><strong>return_all</strong> – When <code class="docutils literal notranslate"><span class="pre">False</span></code>, omit per-window diagnostics and raw backend output.</p></li>
+<li><p><strong>change_type</strong> – Explicit change type: <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;var&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;distribution&quot;</span></code>.</p></li>
+<li><p><strong>eps</strong> – Small positive value used by backend numerical safeguards.</p></li>
+<li><p><strong>batch_size</strong> – Number of local comparisons batched per worker.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Structured result containing selected change points, vote scores,
+per-window diagnostics, parameters, and runtime metadata.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ScanResult</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.detector.scan_single_window">
+<span class="sig-prename descclassname"><span class="pre">scan.detector.</span></span><span class="sig-name descname"><span class="pre">scan_single_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tukey'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ipm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'wasserstein'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">WindowResult</span></span></span><a class="headerlink" href="#scan.detector.scan_single_window" title="Link to this definition"></a></dt>
+<dd><p>Run SCAN for one window size and return per-location diagnostics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – One-dimensional numeric series to scan.</p></li>
+<li><p><strong>window_size</strong> – Half-window size used for every local comparison.</p></li>
+<li><p><strong>alpha</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>n_boot</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>block_length</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>taper</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>ipm</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>random_state</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>change_type</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>eps</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+<li><p><strong>batch_size</strong> – Detection controls with the same meaning as in <a class="reference internal" href="#scan.detector.scan_cpd" title="scan.detector.scan_cpd"><code class="xref py py-func docutils literal notranslate"><span class="pre">scan_cpd()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Diagnostics for the supplied window size, including local statistics,
+thresholds, localized regions, and candidate change points.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>WindowResult</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="plotting">
+<h1>Plotting<a class="headerlink" href="#plotting" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.plotting.plot_time_series">
+<span class="sig-prename descclassname"><span class="pre">scan.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_change_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Time</span> <span class="pre">series'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scan.plotting.plot_time_series" title="Link to this definition"></a></dt>
+<dd><p>Plot a univariate time series with optional change-point markers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – One-dimensional series to plot.</p></li>
+<li><p><strong>change_points</strong> – Optional detected split locations.</p></li>
+<li><p><strong>true_change_points</strong> – Optional ground-truth split locations.</p></li>
+<li><p><strong>index</strong> – Optional x-axis values. If omitted and <code class="docutils literal notranslate"><span class="pre">x</span></code> has an <code class="docutils literal notranslate"><span class="pre">index</span></code> attribute,
+that index is used; otherwise integer positions are used.</p></li>
+<li><p><strong>x_label</strong> – Plot labels.</p></li>
+<li><p><strong>y_label</strong> – Plot labels.</p></li>
+<li><p><strong>title</strong> – Plot labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Time-series plot with detected and true change-point markers when
+provided.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plotnine.ggplot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.plotting.plot_change_points">
+<span class="sig-prename descclassname"><span class="pre">scan.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_change_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ScanResult</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_change_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Series'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scan.plotting.plot_change_points" title="Link to this definition"></a></dt>
+<dd><p>Plot a time series with detected and optional true change points.</p>
+<p>Detected change points are taken from <code class="docutils literal notranslate"><span class="pre">result.change_points</span></code>.
+True change points should be provided separately using
+<code class="docutils literal notranslate"><span class="pre">true_change_points</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – One-dimensional series to plot.</p></li>
+<li><p><strong>result</strong> – SCAN result containing detected change points.</p></li>
+<li><p><strong>true_change_points</strong> – Optional ground-truth split locations.</p></li>
+<li><p><strong>index</strong> – Optional x-axis values.</p></li>
+<li><p><strong>x_label</strong> – Plot labels.</p></li>
+<li><p><strong>y_label</strong> – Plot labels.</p></li>
+<li><p><strong>title</strong> – Plot labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Time-series plot with detected and optional true change-point markers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plotnine.ggplot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.plotting.plot_swal_curve">
+<span class="sig-prename descclassname"><span class="pre">scan.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_swal_curve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Time</span> <span class="pre">series'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Scaled</span> <span class="pre">Wasserstein</span> <span class="pre">statistic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scan.plotting.plot_swal_curve" title="Link to this definition"></a></dt>
+<dd><p>Plot the SWAL/Wasserstein localization curve inside one region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Full series containing the localized region.</p></li>
+<li><p><strong>start</strong> – Half-open bounds of the local region to refine and plot.</p></li>
+<li><p><strong>end</strong> – Half-open bounds of the local region to refine and plot.</p></li>
+<li><p><strong>x_label</strong> – Plot labels.</p></li>
+<li><p><strong>y_label</strong> – Plot labels.</p></li>
+<li><p><strong>title</strong> – Plot labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Local refinement curve with the selected split marked.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plotnine.ggplot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.plotting.plot_vote_scree">
+<span class="sig-prename descclassname"><span class="pre">scan.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_vote_scree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ScanResult</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Voting</span> <span class="pre">threshold</span> <span class="pre">$(\\nu)$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Number</span> <span class="pre">of</span> <span class="pre">retained</span> <span class="pre">change</span> <span class="pre">points'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scan.plotting.plot_vote_scree" title="Link to this definition"></a></dt>
+<dd><p>Plot number of retained change points versus voting threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> – SCAN result containing ensemble vote scores.</p></li>
+<li><p><strong>x_label</strong> – Plot labels.</p></li>
+<li><p><strong>y_label</strong> – Plot labels.</p></li>
+<li><p><strong>title</strong> – Plot labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Scree plot showing how many candidates remain as the vote threshold
+changes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plotnine.ggplot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.plotting.plot_window_votes">
+<span class="sig-prename descclassname"><span class="pre">scan.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_window_votes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ScanResult</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_x_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Candidate</span> <span class="pre">change</span> <span class="pre">point'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Window</span> <span class="pre">votes'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scan.plotting.plot_window_votes" title="Link to this definition"></a></dt>
+<dd><p>Plot ensemble vote counts for candidate change points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> – SCAN result containing raw vote counts and scores.</p></li>
+<li><p><strong>max_x_labels</strong> – Maximum number of x-axis labels to display.</p></li>
+<li><p><strong>x_label_angle</strong> – Rotation angle for x-axis labels.</p></li>
+<li><p><strong>x_label</strong> – Plot labels.</p></li>
+<li><p><strong>y_label</strong> – Plot labels.</p></li>
+<li><p><strong>title</strong> – Plot labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Bar chart of candidate vote counts with the selected vote threshold.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plotnine.ggplot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.plotting.plot_thresholds">
+<span class="sig-prename descclassname"><span class="pre">scan.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_thresholds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scan.plotting.plot_thresholds" title="Link to this definition"></a></dt>
+<dd><p>Placeholder for a future threshold diagnostics plot.</p>
+<p>This function is exported for API continuity but is not implemented yet.
+It currently returns <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="evaluation-metrics">
+<h1>Evaluation Metrics<a class="headerlink" href="#evaluation-metrics" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.metrics.covering_metric">
+<span class="sig-prename descclassname"><span class="pre">scan.metrics.</span></span><span class="sig-name descname"><span class="pre">covering_metric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#scan.metrics.covering_metric" title="Link to this definition"></a></dt>
+<dd><p>Compute a weighted segment-covering score in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p>Each true segment is compared with all estimated segments using
+intersection-over-union, then weighted by the true segment length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_cps</strong> – Ground-truth split locations.</p></li>
+<li><p><strong>estimated_cps</strong> – Estimated split locations.</p></li>
+<li><p><strong>n</strong> – Total series length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Weighted covering score, where 1 is perfect segment agreement.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.metrics.precision_recall_cpd">
+<span class="sig-prename descclassname"><span class="pre">scan.metrics.</span></span><span class="sig-name descname"><span class="pre">precision_recall_cpd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#scan.metrics.precision_recall_cpd" title="Link to this definition"></a></dt>
+<dd><p>Return tolerant precision and recall.</p>
+<p>Empty sets are handled in the usual change-point evaluation convention:
+precision is 1 when there are no estimates and no true points, and recall
+is 1 when there are no true points and no estimates.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.metrics.f1_score_cpd">
+<span class="sig-prename descclassname"><span class="pre">scan.metrics.</span></span><span class="sig-name descname"><span class="pre">f1_score_cpd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#scan.metrics.f1_score_cpd" title="Link to this definition"></a></dt>
+<dd><p>Return tolerant F1 score for change-point estimates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_cps</strong> – Ground-truth and estimated split locations.</p></li>
+<li><p><strong>estimated_cps</strong> – Ground-truth and estimated split locations.</p></li>
+<li><p><strong>tolerance</strong> – Maximum absolute distance allowed when matching points.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Harmonic mean of tolerant precision and recall.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.metrics.match_change_points">
+<span class="sig-prename descclassname"><span class="pre">scan.metrics.</span></span><span class="sig-name descname"><span class="pre">match_change_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#scan.metrics.match_change_points" title="Link to this definition"></a></dt>
+<dd><p>Match true and estimated change points within a tolerance.</p>
+<p>The matching is greedy by increasing absolute distance, so each true and
+estimated change point can appear in at most one pair.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_cps</strong> – Ground-truth split locations.</p></li>
+<li><p><strong>estimated_cps</strong> – Estimated split locations.</p></li>
+<li><p><strong>tolerance</strong> – Maximum absolute distance allowed for a match.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Matched <code class="docutils literal notranslate"><span class="pre">(true_cp,</span> <span class="pre">estimated_cp)</span></code> pairs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="univariate-simulator">
+<h1>Univariate Simulator<a class="headerlink" href="#univariate-simulator" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scan.simulator.</span></span><span class="sig-name descname"><span class="pre">UnivariateSeriesSimulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">len_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">123</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator" title="Link to this definition"></a></dt>
+<dd><p>Simulator for shifted univariate time series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>len_series</strong> (<em>int</em>) – Number of observations to simulate.</p></li>
+<li><p><strong>initial_value</strong> (<em>float</em>) – Initial value used by autoregressive generators.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Seed used by NumPy random number generators.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.apply_random_shifts">
+<span class="sig-name descname"><span class="pre">apply_random_shifts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_point_locations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shifts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_multipliers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lognormal_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lognormal_sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pre_change'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'first_segment'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.apply_random_shifts" title="Link to this definition"></a></dt>
+<dd><p>Apply mean and/or variance shifts at supplied split locations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>series</strong> – Base one-dimensional series to transform.</p></li>
+<li><p><strong>change_point_locations</strong> – Split locations where segment parameters change.</p></li>
+<li><p><strong>min_shift</strong> – Range for randomly generated mean-shift magnitudes.</p></li>
+<li><p><strong>max_shift</strong> – Range for randomly generated mean-shift magnitudes.</p></li>
+<li><p><strong>shifts</strong> – Optional scalar or per-change mean shifts.</p></li>
+<li><p><strong>seed</strong> – Optional seed overriding the simulator seed for shift generation.</p></li>
+<li><p><strong>change_type</strong> – Shift type: <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;variance&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;distribution&quot;</span></code>.</p></li>
+<li><p><strong>variance_multipliers</strong> – Optional scalar or per-change variance multipliers.</p></li>
+<li><p><strong>lognormal_mean</strong> – Parameters used for random variance multipliers.</p></li>
+<li><p><strong>lognormal_sigma</strong> – Parameters used for random variance multipliers.</p></li>
+<li><p><strong>variance_center</strong> – Center used when rescaling segment variance.</p></li>
+<li><p><strong>variance_reference</strong> – Reference variance source for multipliers.</p></li>
+<li><p><strong>eps</strong> – Small positive floor for near-zero variances.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Original series, shifted series, change points, mean shifts, and
+variance multipliers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, numpy.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.arfima_sim">
+<span class="sig-name descname"><span class="pre">arfima_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.arfima_sim" title="Link to this definition"></a></dt>
+<dd><p>Simulate an ARFIMA(p,d,q) series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> – Fractional integration parameter.</p></li>
+<li><p><strong>ar</strong> – Optional autoregressive coefficients.</p></li>
+<li><p><strong>ma</strong> – Optional moving-average coefficients.</p></li>
+<li><p><strong>sigma</strong> – Innovation standard deviation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Simulated ARFIMA series of length <code class="docutils literal notranslate"><span class="pre">len_series</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.determine_change_points">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_change_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.determine_change_points" title="Link to this definition"></a></dt>
+<dd><p>Determine a default number of change points from a length ratio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Series length.</p></li>
+<li><p><strong>ratio</strong> – Approximate observations per change point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Floor of <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">ratio</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.fracint_weights">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fracint_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.fracint_weights" title="Link to this definition"></a></dt>
+<dd><p>Return fractional integration weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> – Fractional differencing/integration parameter.</p></li>
+<li><p><strong>m</strong> – Number of weights to generate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Fractional integration weights of length <code class="docutils literal notranslate"><span class="pre">m</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.select_change_point_locations">
+<span class="sig-name descname"><span class="pre">select_change_point_locations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_first_cp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.select_change_point_locations" title="Link to this definition"></a></dt>
+<dd><p>Select sorted split locations with a minimum spacing constraint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_points</strong> – Minimum distance between consecutive selected split locations.</p></li>
+<li><p><strong>ratio</strong> – Used to infer the number of change points when <code class="docutils literal notranslate"><span class="pre">n_cps</span></code> is not
+provided.</p></li>
+<li><p><strong>min_first_cp</strong> – Earliest allowed split location.</p></li>
+<li><p><strong>n_cps</strong> – Optional explicit number of change points to select.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sorted integer split locations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.simulate_ar_series">
+<span class="sig-name descname"><span class="pre">simulate_ar_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.03</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.simulate_ar_series" title="Link to this definition"></a></dt>
+<dd><p>Simulate an AR(1) series with normal or Cauchy innovations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> – Autoregressive coefficient.</p></li>
+<li><p><strong>error_type</strong> – Innovation family: <code class="docutils literal notranslate"><span class="pre">&quot;normal&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;cauchy&quot;</span></code>.</p></li>
+<li><p><strong>error_mean</strong> – Mean and variance used for normal innovations.</p></li>
+<li><p><strong>error_variance</strong> – Mean and variance used for normal innovations.</p></li>
+<li><p><strong>error_location</strong> – Location and scale used for Cauchy innovations.</p></li>
+<li><p><strong>error_scale</strong> – Location and scale used for Cauchy innovations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Simulated series of length <code class="docutils literal notranslate"><span class="pre">len_series</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.simulate_ar_unif">
+<span class="sig-name descname"><span class="pre">simulate_ar_unif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.simulate_ar_unif" title="Link to this definition"></a></dt>
+<dd><p>Simulate an AR process with random time-varying coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error_variance</strong> – Variance of Gaussian innovations.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Simulated series with <code class="docutils literal notranslate"><span class="pre">rho_t</span></code> drawn uniformly from <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scan.simulator.UnivariateSeriesSimulator.simulate_arma">
+<span class="sig-name descname"><span class="pre">simulate_arma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#scan.simulator.UnivariateSeriesSimulator.simulate_arma" title="Link to this definition"></a></dt>
+<dd><p>Simulate an ARMA process using statsmodels when it is installed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phi</strong> – Autoregressive coefficients.</p></li>
+<li><p><strong>theta</strong> – Moving-average coefficients.</p></li>
+<li><p><strong>error_mean</strong> – Mean and variance of Gaussian innovations.</p></li>
+<li><p><strong>error_variance</strong> – Mean and variance of Gaussian innovations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Simulated ARMA series.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.simulator.simulate_time_series">
+<span class="sig-prename descclassname"><span class="pre">scan.simulator.</span></span><span class="sig-name descname"><span class="pre">simulate_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_seg_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">235</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'distribution'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">123</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#scan.simulator.simulate_time_series" title="Link to this definition"></a></dt>
+<dd><p>Simulate a shifted AR(1) series using <code class="docutils literal notranslate"><span class="pre">UnivariateSeriesSimulator</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Series length.</p></li>
+<li><p><strong>n_cps</strong> – Number of change points to insert.</p></li>
+<li><p><strong>min_seg_len</strong> – Minimum spacing between change points.</p></li>
+<li><p><strong>change_type</strong> – Type of change to apply.</p></li>
+<li><p><strong>seed</strong> – Random seed used by the simulator.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Shifted series, true change points, segment means, and segment standard
+deviations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="utils">
+<h1>Utils<a class="headerlink" href="#utils" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.simulator.choose_window_sizes">
+<span class="sig-prename descclassname"><span class="pre">scan.simulator.</span></span><span class="sig-name descname"><span class="pre">choose_window_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_windows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#scan.simulator.choose_window_sizes" title="Link to this definition"></a></dt>
+<dd><p>Choose a reproducible set of safe scan window sizes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>series_length</strong> – Length of the series that will be scanned.</p></li>
+<li><p><strong>n_windows</strong> – Maximum number of window sizes to return.</p></li>
+<li><p><strong>seed</strong> – Random seed used when sampling from candidate sizes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sorted scan window sizes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.ensemble.ensemble_vote">
+<span class="sig-prename descclassname"><span class="pre">scan.ensemble.</span></span><span class="sig-name descname"><span class="pre">ensemble_vote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#scan.ensemble.ensemble_vote" title="Link to this definition"></a></dt>
+<dd><p>Apply ensemble voting across window-specific candidate lists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window_results</strong> – Mapping from window size to candidate split locations.</p></li>
+<li><p><strong>vote_threshold</strong> – Minimum fraction of windows required to retain a cluster leader.</p></li>
+<li><p><strong>tolerance</strong> – Maximum gap used to cluster nearby candidates before voting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Selected change points, normalized vote scores, and raw vote counts.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list[int], dict[int, float], dict[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.ensemble.merge_change_points">
+<span class="sig-prename descclassname"><span class="pre">scan.ensemble.</span></span><span class="sig-name descname"><span class="pre">merge_change_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#scan.ensemble.merge_change_points" title="Link to this definition"></a></dt>
+<dd><p>Cluster nearby candidate change points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>change_points</strong> – Candidate split locations to group.</p></li>
+<li><p><strong>tolerance</strong> – Maximum gap between consecutive candidates in the same cluster.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sorted clusters of nearby candidate locations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.bootstrap.adaptive_threshold">
+<span class="sig-prename descclassname"><span class="pre">scan.bootstrap.</span></span><span class="sig-name descname"><span class="pre">adaptive_threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tukey'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#scan.bootstrap.adaptive_threshold" title="Link to this definition"></a></dt>
+<dd><p>Compute a local bootstrap threshold for a two-window comparison.</p>
+<p>The two windows are mean-centered and pooled before bootstrapping so the
+null distribution represents no local distributional change.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>left</strong> – Adjacent samples to compare.</p></li>
+<li><p><strong>right</strong> – Adjacent samples to compare.</p></li>
+<li><p><strong>alpha</strong> – Upper-tail probability for the returned threshold.</p></li>
+<li><p><strong>n_boot</strong> – Number of bootstrap samples used to approximate the null distribution.</p></li>
+<li><p><strong>block_length</strong> – Optional bootstrap block length.</p></li>
+<li><p><strong>taper</strong> – Taper shape passed to <a class="reference internal" href="#scan.bootstrap.tapered_block_bootstrap" title="scan.bootstrap.tapered_block_bootstrap"><code class="xref py py-func docutils literal notranslate"><span class="pre">tapered_block_bootstrap()</span></code></a>.</p></li>
+<li><p><strong>random_state</strong> – Optional NumPy random seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Empirical <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">alpha</span></code> quantile of bootstrapped Wasserstein
+statistics.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scan.bootstrap.tapered_block_bootstrap">
+<span class="sig-prename descclassname"><span class="pre">scan.bootstrap.</span></span><span class="sig-name descname"><span class="pre">tapered_block_bootstrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tukey'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#scan.bootstrap.tapered_block_bootstrap" title="Link to this definition"></a></dt>
+<dd><p>Generate tapered block bootstrap samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – One-dimensional source series used to draw overlapping blocks.</p></li>
+<li><p><strong>sample_length</strong> – Number of observations in each bootstrap replicate.</p></li>
+<li><p><strong>block_length</strong> – Length of each sampled block. When omitted, uses <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">**</span> <span class="pre">(1</span> <span class="pre">/</span> <span class="pre">3)</span></code> with
+a minimum of 3 observations.</p></li>
+<li><p><strong>n_boot</strong> – Number of bootstrap replicates to generate.</p></li>
+<li><p><strong>taper</strong> – Taper shape. Use <code class="docutils literal notranslate"><span class="pre">&quot;tukey&quot;</span></code> for Hann-style tapering or <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code> for
+rectangular blocks.</p></li>
+<li><p><strong>random_state</strong> – Optional NumPy random seed for reproducible sampling.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array with shape <code class="docutils literal notranslate"><span class="pre">(n_boot,</span> <span class="pre">sample_length)</span></code> containing bootstrap
+replicates.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Ashoka Prabashwara.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

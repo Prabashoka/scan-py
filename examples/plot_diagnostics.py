@@ -1,9 +1,4 @@
-r"""Generate SCAN diagnostic plots and save them as PNG files.
-
-Run from the repository root:
-
-    .\.venv\Scripts\python.exe examples\plot_diagnostics.py
-"""
+"""Generate diagnostic SCAN plots for a small synthetic example."""
 
 from __future__ import annotations
 

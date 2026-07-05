@@ -1,3 +1,9 @@
+"""High-level Python wrappers around the Rust SCAN detector.
+
+The functions in this module validate Python inputs, choose defaults, dispatch
+to ``scan._scan_rust``, and normalize Rust dictionaries into dataclasses.
+"""
+
 import os
 import time
 from typing import Iterable, List, Optional, Sequence
@@ -11,6 +17,7 @@ _ALLOWED_CHANGE_TYPES = {"mean", "var", "distribution"}
 
 
 def _as_float_list(x: Iterable[float]) -> List[float]:
+    """Convert an input series to a finite one-dimensional Python float list."""
     arr = np.asarray(x, dtype=np.float64).ravel()
     if arr.size < 3:
         raise ValueError("x must contain at least 3 observations")
@@ -20,6 +27,7 @@ def _as_float_list(x: Iterable[float]) -> List[float]:
 
 
 def _as_window_list(window_sizes: Iterable[int]) -> List[int]:
+    """Normalize window sizes to a sorted unique list of positive integers."""
     windows = sorted({int(w) for w in window_sizes})
     if not windows:
         raise ValueError("window_sizes must not be empty")
@@ -29,6 +37,7 @@ def _as_window_list(window_sizes: Iterable[int]) -> List[int]:
 
 
 def _default_window_sizes(n: int, min_window: int, max_window: Optional[int]) -> List[int]:
+    """Choose a small default grid of scan window sizes for a series length."""
     min_window = int(min_window)
     if min_window <= 0:
         raise ValueError("min_window must be positive")
@@ -45,6 +54,7 @@ def _default_window_sizes(n: int, min_window: int, max_window: Optional[int]) ->
 
 
 def _validate_change_type(value: str) -> str:
+    """Validate and normalize the requested change type."""
     normalized = str(value).lower()
     if normalized not in _ALLOWED_CHANGE_TYPES:
         raise ValueError("change_type must be one of {'mean', 'var', 'distribution'}")
@@ -52,6 +62,7 @@ def _validate_change_type(value: str) -> str:
 
 
 def _change_type_from_ipm(ipm: str, change_type: Optional[str]) -> str:
+    """Resolve legacy ``ipm`` values and explicit ``change_type`` values."""
     if change_type is not None:
         return _validate_change_type(change_type)
 
@@ -64,6 +75,7 @@ def _change_type_from_ipm(ipm: str, change_type: Optional[str]) -> str:
 
 
 def _normalize_alpha(alpha: float) -> float:
+    """Validate the significance level used for bootstrap thresholds."""
     alpha = float(alpha)
     if alpha <= 0:
         raise ValueError("alpha must be positive")
@@ -71,6 +83,7 @@ def _normalize_alpha(alpha: float) -> float:
 
 
 def _normalize_taper(taper: str) -> float:
+    """Map user-facing taper names to the Rust backend taper ratio."""
     value = str(taper).lower()
     if value in {"tukey", "cosine"}:
         return 0.5
@@ -80,6 +93,7 @@ def _normalize_taper(taper: str) -> float:
 
 
 def _resolve_n_jobs(n_jobs: Optional[int]) -> tuple[Optional[int], int, int]:
+    """Return requested, resolved, and available parallel worker counts."""
     cpu_count = os.cpu_count() or 1
 
     if n_jobs is None:
@@ -119,6 +133,55 @@ def scan_cpd(
 
     Change points use Python split indexing: a returned value ``t`` denotes the
     split between ``x[:t]`` and ``x[t:]``.
+
+    Parameters
+    ----------
+    x:
+        One-dimensional numeric series to scan.
+    window_sizes:
+        Candidate half-window sizes. If omitted, a small grid is derived from
+        ``min_window`` and ``max_window``.
+    alpha:
+        Bootstrap significance level used by each local scan.
+    n_boot:
+        Number of tapered block bootstrap draws per local comparison.
+    vote_threshold:
+        Minimum ensemble vote score required to retain a candidate change
+        point.
+    min_window, max_window:
+        Bounds used only when ``window_sizes`` is omitted.
+    block_length:
+        Optional bootstrap block length. If omitted, the backend applies the
+        selected ``block_length_rule``.
+    block_length_rule:
+        Rule for automatic block lengths. Currently only ``"n^(1/3)"`` is
+        supported by this wrapper.
+    taper:
+        Taper applied to bootstrap blocks. Supported values are ``"tukey"`` and
+        ``"none"``.
+    ipm:
+        Legacy discrepancy selector. ``"wasserstein"`` maps to distributional
+        change detection.
+    tolerance:
+        Maximum distance for grouping nearby candidates during ensemble voting.
+    random_state:
+        Optional random seed passed to the Rust backend.
+    n_jobs:
+        Number of worker threads. Use ``-1`` for all available CPUs.
+    return_all:
+        When ``False``, omit per-window diagnostics and raw backend output.
+    change_type:
+        Explicit change type: ``"mean"``, ``"var"``, or ``"distribution"``.
+    eps:
+        Small positive value used by backend numerical safeguards.
+    batch_size:
+        Number of local comparisons batched per worker.
+
+    Returns
+    -------
+    ScanResult
+        Structured result containing selected change points, vote scores,
+        per-window diagnostics, parameters, and runtime metadata.
     """
 
     series = _as_float_list(x)
@@ -170,6 +233,8 @@ def scan_cpd(
     }
 
     start = time.perf_counter()
+    # The Rust backend does the numerical scan; the Python layer owns input
+    # validation, default resolution, and result normalization.
     raw = _scan_rust.scan_detector(
         series,
         windows,
@@ -234,7 +299,23 @@ def scan_single_window(
     eps: float = 1e-12,
     batch_size: int = 32,
 ) -> WindowResult:
-    """Run SCAN for one window size and return per-location diagnostics."""
+    """Run SCAN for one window size and return per-location diagnostics.
+
+    Parameters
+    ----------
+    x:
+        One-dimensional numeric series to scan.
+    window_size:
+        Half-window size used for every local comparison.
+    alpha, n_boot, block_length, taper, ipm, random_state, change_type, eps, batch_size:
+        Detection controls with the same meaning as in :func:`scan_cpd`.
+
+    Returns
+    -------
+    WindowResult
+        Diagnostics for the supplied window size, including local statistics,
+        thresholds, localized regions, and candidate change points.
+    """
 
     series = _as_float_list(x)
     window_size = int(window_size)

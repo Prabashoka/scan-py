@@ -1,3 +1,10 @@
+"""Simulation and benchmarking utilities for SCAN examples.
+
+The simulator creates univariate time series with controlled mean, variance,
+or distributional changes. The benchmark helpers use those series to exercise
+the high-level detector with reproducible defaults.
+"""
+
 import gc
 import math
 import time as pytime
@@ -12,6 +19,7 @@ _ALLOWED_CHANGE_TYPES = {"mean", "var", "variance", "distribution", "both"}
 
 
 def _normalize_change_type(change_type: str) -> str:
+    """Normalize user change-type aliases to simulator-internal names."""
     value = str(change_type).lower()
     if value not in _ALLOWED_CHANGE_TYPES:
         raise ValueError("change_type must be one of {'mean', 'var', 'variance', 'distribution'}")
@@ -24,13 +32,24 @@ def _normalize_change_type(change_type: str) -> str:
 
 @dataclass
 class UnivariateSeriesSimulator:
-    """Simulator for shifted univariate time series."""
+    """Simulator for shifted univariate time series.
+
+    Parameters
+    ----------
+    len_series:
+        Number of observations to simulate.
+    initial_value:
+        Initial value used by autoregressive generators.
+    seed:
+        Seed used by NumPy random number generators.
+    """
 
     len_series: int
     initial_value: float = 0.0
     seed: int = 123
 
     def __post_init__(self) -> None:
+        """Validate and normalize dataclass fields after initialization."""
         self.len_series = int(self.len_series)
         if self.len_series < 3:
             raise ValueError("len_series must be at least 3")
@@ -46,7 +65,24 @@ class UnivariateSeriesSimulator:
         error_location: float = 0.0,
         error_scale: float = 0.03,
     ) -> np.ndarray:
-        """Simulate an AR(1) series with normal or Cauchy innovations."""
+        """Simulate an AR(1) series with normal or Cauchy innovations.
+
+        Parameters
+        ----------
+        rho:
+            Autoregressive coefficient.
+        error_type:
+            Innovation family: ``"normal"`` or ``"cauchy"``.
+        error_mean, error_variance:
+            Mean and variance used for normal innovations.
+        error_location, error_scale:
+            Location and scale used for Cauchy innovations.
+
+        Returns
+        -------
+        numpy.ndarray
+            Simulated series of length ``len_series``.
+        """
         rng = np.random.default_rng(self.seed)
         x = np.empty(self.len_series, dtype=float)
         x_prev = self.initial_value
@@ -62,7 +98,18 @@ class UnivariateSeriesSimulator:
         return x
 
     def simulate_ar_unif(self, error_variance: float = 1.0) -> np.ndarray:
-        """Simulate an AR process with time-varying uniform autoregressive coefficients."""
+        """Simulate an AR process with random time-varying coefficients.
+
+        Parameters
+        ----------
+        error_variance:
+            Variance of Gaussian innovations.
+
+        Returns
+        -------
+        numpy.ndarray
+            Simulated series with ``rho_t`` drawn uniformly from ``[0, 1]``.
+        """
         rng = np.random.default_rng(self.seed)
         rho = rng.uniform(0.0, 1.0, size=self.len_series)
         eps = rng.normal(0.0, np.sqrt(error_variance), size=self.len_series)
@@ -79,7 +126,22 @@ class UnivariateSeriesSimulator:
         error_mean: float = 0.0,
         error_variance: float = 1.0,
     ) -> np.ndarray:
-        """Simulate an ARMA process using statsmodels when it is installed."""
+        """Simulate an ARMA process using statsmodels when it is installed.
+
+        Parameters
+        ----------
+        phi:
+            Autoregressive coefficients.
+        theta:
+            Moving-average coefficients.
+        error_mean, error_variance:
+            Mean and variance of Gaussian innovations.
+
+        Returns
+        -------
+        numpy.ndarray
+            Simulated ARMA series.
+        """
         try:
             from statsmodels.tsa.arima_process import ArmaProcess
         except ImportError as exc:  # pragma: no cover - depends on optional dependency
@@ -98,7 +160,20 @@ class UnivariateSeriesSimulator:
 
     @staticmethod
     def fracint_weights(d: float, m: int) -> np.ndarray:
-        """Return fractional integration weights."""
+        """Return fractional integration weights.
+
+        Parameters
+        ----------
+        d:
+            Fractional differencing/integration parameter.
+        m:
+            Number of weights to generate.
+
+        Returns
+        -------
+        numpy.ndarray
+            Fractional integration weights of length ``m``.
+        """
         m = int(m)
         if m <= 0:
             raise ValueError("m must be positive")
@@ -115,7 +190,24 @@ class UnivariateSeriesSimulator:
         ma: Optional[Sequence[float]] = None,
         sigma: float = 1.0,
     ) -> np.ndarray:
-        """Simulate an ARFIMA(p,d,q) series."""
+        """Simulate an ARFIMA(p,d,q) series.
+
+        Parameters
+        ----------
+        d:
+            Fractional integration parameter.
+        ar:
+            Optional autoregressive coefficients.
+        ma:
+            Optional moving-average coefficients.
+        sigma:
+            Innovation standard deviation.
+
+        Returns
+        -------
+        numpy.ndarray
+            Simulated ARFIMA series of length ``len_series``.
+        """
         rng = np.random.default_rng(self.seed)
         ar_arr = np.atleast_1d(ar).astype(float) if ar is not None else np.array([])
         ma_arr = np.atleast_1d(ma).astype(float) if ma is not None else np.array([])
@@ -150,7 +242,20 @@ class UnivariateSeriesSimulator:
 
     @staticmethod
     def determine_change_points(n: int, ratio: int = 100) -> int:
-        """Determine a default number of change points from a series length and ratio."""
+        """Determine a default number of change points from a length ratio.
+
+        Parameters
+        ----------
+        n:
+            Series length.
+        ratio:
+            Approximate observations per change point.
+
+        Returns
+        -------
+        int
+            Floor of ``n / ratio``.
+        """
         return int(math.floor(int(n) // int(ratio)))
 
     def select_change_point_locations(
@@ -160,7 +265,25 @@ class UnivariateSeriesSimulator:
         min_first_cp: int = 30,
         n_cps: Optional[int] = None,
     ) -> np.ndarray:
-        """Select sorted split locations with a minimum spacing constraint."""
+        """Select sorted split locations with a minimum spacing constraint.
+
+        Parameters
+        ----------
+        min_points:
+            Minimum distance between consecutive selected split locations.
+        ratio:
+            Used to infer the number of change points when ``n_cps`` is not
+            provided.
+        min_first_cp:
+            Earliest allowed split location.
+        n_cps:
+            Optional explicit number of change points to select.
+
+        Returns
+        -------
+        numpy.ndarray
+            Sorted integer split locations.
+        """
         n = self.len_series
         count = self.determine_change_points(n, ratio=ratio) if n_cps is None else int(n_cps)
         if count <= 0:
@@ -202,7 +325,39 @@ class UnivariateSeriesSimulator:
         variance_reference: str = "first_segment",
         eps: float = 1e-12,
     ) -> dict[str, np.ndarray]:
-        """Apply mean and/or variance shifts at supplied split locations."""
+        """Apply mean and/or variance shifts at supplied split locations.
+
+        Parameters
+        ----------
+        series:
+            Base one-dimensional series to transform.
+        change_point_locations:
+            Split locations where segment parameters change.
+        min_shift, max_shift:
+            Range for randomly generated mean-shift magnitudes.
+        shifts:
+            Optional scalar or per-change mean shifts.
+        seed:
+            Optional seed overriding the simulator seed for shift generation.
+        change_type:
+            Shift type: ``"mean"``, ``"variance"``, or ``"distribution"``.
+        variance_multipliers:
+            Optional scalar or per-change variance multipliers.
+        lognormal_mean, lognormal_sigma:
+            Parameters used for random variance multipliers.
+        variance_center:
+            Center used when rescaling segment variance.
+        variance_reference:
+            Reference variance source for multipliers.
+        eps:
+            Small positive floor for near-zero variances.
+
+        Returns
+        -------
+        dict[str, numpy.ndarray]
+            Original series, shifted series, change points, mean shifts, and
+            variance multipliers.
+        """
         x = np.asarray(series, dtype=float)
         if x.ndim != 1:
             raise ValueError("series must be one-dimensional")
@@ -296,6 +451,8 @@ class UnivariateSeriesSimulator:
             variance_factor = variance_mults[seg_idx - 1]
             target_std = np.sqrt(max(float(variance_factor) * ref_var, eps))
 
+            # Preserve the selected center while stretching or regenerating the
+            # segment to match the requested variance multiplier.
             if variance_center == "pre_change":
                 center_value = float(np.mean(seg))
             elif variance_center == "global":
@@ -331,7 +488,27 @@ def simulate_time_series(
     change_type: str = "distribution",
     seed: int = 123,
 ):
-    """Simulate a shifted AR(1) series using ``UnivariateSeriesSimulator``."""
+    """Simulate a shifted AR(1) series using ``UnivariateSeriesSimulator``.
+
+    Parameters
+    ----------
+    n:
+        Series length.
+    n_cps:
+        Number of change points to insert.
+    min_seg_len:
+        Minimum spacing between change points.
+    change_type:
+        Type of change to apply.
+    seed:
+        Random seed used by the simulator.
+
+    Returns
+    -------
+    tuple
+        Shifted series, true change points, segment means, and segment standard
+        deviations.
+    """
     simulator = UnivariateSeriesSimulator(len_series=n, seed=seed)
     base = simulator.simulate_ar_series(rho=0, error_type="normal")
     cps = simulator.select_change_point_locations(min_points=min_seg_len, n_cps=n_cps)
@@ -354,7 +531,11 @@ def simulate_time_series(
 
 
 def safe_min_seg_len(n: int, k: int, spacing_hint: int, safety_fraction: float = 0.8) -> int:
-    """Clamp a requested spacing to a feasible minimum segment length."""
+    """Clamp a requested spacing to a feasible minimum segment length.
+
+    The returned value is at least 5 and no larger than a safety fraction of
+    the average segment length.
+    """
     max_feasible = int(n) // (int(k) + 1)
     safe_value = int(float(safety_fraction) * max_feasible)
     min_seg_len = min(int(spacing_hint), safe_value)
@@ -362,7 +543,22 @@ def safe_min_seg_len(n: int, k: int, spacing_hint: int, safety_fraction: float =
 
 
 def choose_window_sizes(series_length: int, n_windows: int = 7, seed: int = 500) -> list[int]:
-    """Choose a reproducible set of safe scan window sizes."""
+    """Choose a reproducible set of safe scan window sizes.
+
+    Parameters
+    ----------
+    series_length:
+        Length of the series that will be scanned.
+    n_windows:
+        Maximum number of window sizes to return.
+    seed:
+        Random seed used when sampling from candidate sizes.
+
+    Returns
+    -------
+    list[int]
+        Sorted scan window sizes.
+    """
     rng = np.random.default_rng(seed)
     upper = int(np.sqrt(int(series_length)))
 
@@ -399,7 +595,39 @@ def run_one_benchmark(
     batch_size: int = 32,
     seed: int = 500,
 ) -> dict[str, Any]:
-    """Simulate one benchmark series and run ``scan_cpd`` on it."""
+    """Simulate one benchmark series and run ``scan_cpd`` on it.
+
+    Parameters
+    ----------
+    n:
+        Series length.
+    k:
+        Number of true change points.
+    spacing_hint:
+        Requested minimum segment length before feasibility clamping.
+    change_type:
+        Type of simulated change.
+    n_windows:
+        Number of scan window sizes to sample.
+    n_boot:
+        Bootstrap replicates per local scan.
+    alpha:
+        Bootstrap significance level.
+    vote_threshold:
+        Ensemble vote score required to retain a point.
+    n_jobs:
+        Optional number of detector worker threads.
+    batch_size:
+        Backend batch size.
+    seed:
+        Random seed shared by simulation and detection defaults.
+
+    Returns
+    -------
+    dict[str, Any]
+        Benchmark metadata, true and detected change points, timing, and the
+        full :class:`scan.result.ScanResult`.
+    """
     min_seg_len = safe_min_seg_len(n=n, k=k, spacing_hint=spacing_hint, safety_fraction=0.8)
 
     x, true_cps, means, sigmas = simulate_time_series(

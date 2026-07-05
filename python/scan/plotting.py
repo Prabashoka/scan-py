@@ -1,3 +1,5 @@
+"""Plotnine-based visualization helpers for SCAN results."""
+
 from typing import Iterable, Optional
 
 import numpy as np
@@ -33,6 +35,7 @@ SCAN_GRID = "#D9D9D9"
 
 
 def _comma_labels(values):
+    """Format numeric axis labels with thousands separators."""
     return [f"{value:,.0f}" for value in values]
 
 
@@ -79,7 +82,28 @@ def plot_time_series(
     y_label: str = "Value",
     title: str = "Time series",
 ):
-    """Plot a univariate time series with optional change-point markers."""
+    """Plot a univariate time series with optional change-point markers.
+
+    Parameters
+    ----------
+    x:
+        One-dimensional series to plot.
+    change_points:
+        Optional detected split locations.
+    true_change_points:
+        Optional ground-truth split locations.
+    index:
+        Optional x-axis values. If omitted and ``x`` has an ``index`` attribute,
+        that index is used; otherwise integer positions are used.
+    x_label, y_label, title:
+        Plot labels.
+
+    Returns
+    -------
+    plotnine.ggplot
+        Time-series plot with detected and true change-point markers when
+        provided.
+    """
     y = np.asarray(x, dtype=np.float64).ravel()
 
     if index is None and hasattr(x, "index"):
@@ -193,6 +217,24 @@ def plot_change_points(
     Detected change points are taken from ``result.change_points``.
     True change points should be provided separately using
     ``true_change_points``.
+
+    Parameters
+    ----------
+    x:
+        One-dimensional series to plot.
+    result:
+        SCAN result containing detected change points.
+    true_change_points:
+        Optional ground-truth split locations.
+    index:
+        Optional x-axis values.
+    x_label, y_label, title:
+        Plot labels.
+
+    Returns
+    -------
+    plotnine.ggplot
+        Time-series plot with detected and optional true change-point markers.
     """
     y = np.asarray(x, dtype=np.float64).ravel()
 
@@ -338,7 +380,22 @@ def plot_swal_curve(
     y_label: str = "Scaled Wasserstein statistic",
     title: Optional[str] = None,
 ):
-    """Plot the SWAL/Wasserstein localization curve inside one region."""
+    """Plot the SWAL/Wasserstein localization curve inside one region.
+
+    Parameters
+    ----------
+    x:
+        Full series containing the localized region.
+    start, end:
+        Half-open bounds of the local region to refine and plot.
+    x_label, y_label, title:
+        Plot labels.
+
+    Returns
+    -------
+    plotnine.ggplot
+        Local refinement curve with the selected split marked.
+    """
     y = np.asarray(x, dtype=np.float64).ravel()
     start = int(start)
     end = int(end)
@@ -377,7 +434,21 @@ def plot_vote_scree(
     y_label: str = "Number of retained change points",
     title: Optional[str] = None,
 ):
-    """Plot number of retained change points versus voting threshold."""
+    """Plot number of retained change points versus voting threshold.
+
+    Parameters
+    ----------
+    result:
+        SCAN result containing ensemble vote scores.
+    x_label, y_label, title:
+        Plot labels.
+
+    Returns
+    -------
+    plotnine.ggplot
+        Scree plot showing how many candidates remain as the vote threshold
+        changes.
+    """
     thresholds = np.linspace(0, 1, 101)
     scores = np.array(list(result.scores.values()), dtype=float)
     counts = [int(np.sum(scores >= t)) for t in thresholds]
@@ -418,7 +489,24 @@ def plot_window_votes(
     y_label: str = "Window votes",
     title: Optional[str] = None,
 ):
-    """Plot ensemble vote counts for candidate change points."""
+    """Plot ensemble vote counts for candidate change points.
+
+    Parameters
+    ----------
+    result:
+        SCAN result containing raw vote counts and scores.
+    max_x_labels:
+        Maximum number of x-axis labels to display.
+    x_label_angle:
+        Rotation angle for x-axis labels.
+    x_label, y_label, title:
+        Plot labels.
+
+    Returns
+    -------
+    plotnine.ggplot
+        Bar chart of candidate vote counts with the selected vote threshold.
+    """
     n_windows = max(1, len(result.window_results))
     vote_threshold = float(result.parameters.get("vote_threshold", 0.5))
     threshold_votes = vote_threshold * n_windows
@@ -488,4 +576,9 @@ def plot_window_votes(
 
 
 def plot_thresholds():
+    """Placeholder for a future threshold diagnostics plot.
+
+    This function is exported for API continuity but is not implemented yet.
+    It currently returns ``None``.
+    """
     pass

@@ -1,9 +1,24 @@
-﻿from collections import Counter
+"""Ensemble voting helpers for combining window-specific candidates."""
+
+from collections import Counter
 from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 
 def merge_change_points(change_points: Iterable[int], tolerance: int = 10) -> List[List[int]]:
-    """Cluster nearby candidate change-points."""
+    """Cluster nearby candidate change points.
+
+    Parameters
+    ----------
+    change_points:
+        Candidate split locations to group.
+    tolerance:
+        Maximum gap between consecutive candidates in the same cluster.
+
+    Returns
+    -------
+    list[list[int]]
+        Sorted clusters of nearby candidate locations.
+    """
     cps = sorted({int(cp) for cp in change_points})
     if not cps:
         return []
@@ -23,7 +38,22 @@ def ensemble_vote(
     vote_threshold: float = 0.5,
     tolerance: int = 10,
 ) -> Tuple[List[int], Dict[int, float], Dict[int, int]]:
-    """Apply ensemble voting and return final change-points, scores, and votes."""
+    """Apply ensemble voting across window-specific candidate lists.
+
+    Parameters
+    ----------
+    window_results:
+        Mapping from window size to candidate split locations.
+    vote_threshold:
+        Minimum fraction of windows required to retain a cluster leader.
+    tolerance:
+        Maximum gap used to cluster nearby candidates before voting.
+
+    Returns
+    -------
+    tuple[list[int], dict[int, float], dict[int, int]]
+        Selected change points, normalized vote scores, and raw vote counts.
+    """
     if not window_results:
         return [], {}, {}
 

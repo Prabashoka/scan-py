@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "scan-py"
 version = "0.1.0"
-description = "SCAN change-point detection with a Rust core and research-ready Python API"
+description = "Python package for SCAN change-point detection"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
@@ -27,14 +27,17 @@ classifiers = [
 test = [
     "pytest>=8",
 ]
-simulation = [
-    "statsmodels>=0.13",
-]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[project.urls]
+Homepage = "https://github.com/Prabashoka/scan-py"
+Repository = "https://github.com/Prabashoka/scan-py"
+Issues = "https://github.com/Prabashoka/scan-py/issues"
 
 [tool.maturin]
 python-source = "python"
 module-name = "scan._scan_rust"
 features = ["pyo3/extension-module"]
+
