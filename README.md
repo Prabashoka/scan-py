@@ -158,8 +158,8 @@ swal_curve_plot = plot_swal_curve(x_region)
 ```
 
 <p align="center">
-  <img src="plots/local_time_series.png" width="48%">
-  <img src="plots/swal_curve.png" width="48%">
+  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/local_time_series.png" width="48%">
+  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/swal_curve.png" width="48%">
 </p>
 
 **Change in distribution**
@@ -185,8 +185,8 @@ local_cp = swal_statistic(
 print(local_cp)
 ```
 <p align="center">
-  <img src="plots/distribution_change_time_series.png" width="48%">
-  <img src="plots/distribution_change_swal_curve.png" width="48%">
+  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/distribution_change_time_series.png" width="48%">
+  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/distribution_change_swal_curve.png" width="48%">
 </p>
 
 
