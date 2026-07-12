@@ -100,7 +100,7 @@ The detected change points can also be visualized using `plot_change_points`. Th
 ```python
 plot_change_points(x, result)
 ```
-![Detected change points](plots/change_points.png)
+![Detected change points](https://github.com/Prabashoka/scan-py/blob/main/plots/change_points.png)
 To save the plot as an image:
 ```python
 plot = plot_change_points(x, result)
@@ -118,7 +118,7 @@ plot_vote_scree(result)
 The x-axis shows the voting threshold, denoted by ν, and the y-axis shows the number of retained change points at each threshold. A lower threshold keeps more candidate change points, while a higher threshold keeps only candidates supported by more window sizes.
 In practice, choose a value near the point where the curve begins to flatten. This avoids keeping many weak detections while preserving stable change points that are supported across multiple window sizes.
 
-![Majority voting scree plot](plots/vote_scree.png)
+![Majority voting scree plot](https://github.com/Prabashoka/scan-py/blob/main/plots/vote_scree.png)
 
 ### SWAL Statistic
 
