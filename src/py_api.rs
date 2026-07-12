@@ -8,13 +8,18 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-fn window_result_to_py<'py>(py: Python<'py>, result: WindowScanResult) -> PyResult<Bound<'py, PyDict>> {
+fn window_result_to_py<'py>(
+    py: Python<'py>,
+    result: WindowScanResult,
+) -> PyResult<Bound<'py, PyDict>> {
     let out = PyDict::new(py);
     out.set_item("change_points", result.change_points)?;
     out.set_item("starts", result.starts)?;
     out.set_item("statistics", result.statistics)?;
-    out.set_item("tapered_block_bootstrap_threshold", result.tapered_block_bootstrap_threshold)?;
-    out.set_item("localized_regions", result.localized_regions)?;
+    out.set_item(
+        "tapered_block_bootstrap_threshold",
+        result.tapered_block_bootstrap_threshold,
+    )?;
     Ok(out)
 }
 
@@ -33,21 +38,6 @@ fn scan_result_to_py<'py>(py: Python<'py>, result: ScanResult) -> PyResult<Bound
         window_results.set_item(w, window_result_to_py(py, info)?)?;
     }
     root.set_item("window_results", window_results)?;
-
-    let segments = PyDict::new(py);
-    for (name, info) in result.segments {
-        let info_dict = PyDict::new(py);
-        info_dict.set_item("change_points", info.change_points)?;
-
-        let votes = PyDict::new(py);
-        for (cp, vote) in info.votes {
-            votes.set_item(cp, vote)?;
-        }
-        info_dict.set_item("votes", votes)?;
-        info_dict.set_item("segment_vote", info.segment_vote)?;
-        segments.set_item(name, info_dict)?;
-    }
-    root.set_item("segments", segments)?;
 
     let out = PyDict::new(py);
 
@@ -76,7 +66,7 @@ fn scan_result_to_py<'py>(py: Python<'py>, result: ScanResult) -> PyResult<Bound
 }
 
 #[pyfunction]
-#[pyo3(signature = (series, window_sizes=None, n_perm=300, alpha_q=1.0, seed=123, tol=2, workers=None, backend="thread", change_type="mean", eps=1e-12, b=None, taper_ratio=0.5, center=true, batch_size=32))]
+#[pyo3(signature = (series, window_sizes=None, n_perm=300, alpha_q=1.0, seed=123, tol=2, workers=None, backend="thread", change_type="mean", b=None, taper_ratio=0.5, center=true, batch_size=32))]
 #[allow(clippy::too_many_arguments)]
 fn scan_detector<'py>(
     py: Python<'py>,
@@ -89,7 +79,6 @@ fn scan_detector<'py>(
     workers: Option<usize>,
     backend: &str,
     change_type: &str,
-    eps: f64,
     b: Option<usize>,
     taper_ratio: f64,
     center: bool,
@@ -105,7 +94,7 @@ fn scan_detector<'py>(
         workers,
         backend,
         change_type,
-        eps,
+        1e-12,
         b,
         taper_ratio,
         center,
@@ -116,7 +105,7 @@ fn scan_detector<'py>(
 }
 
 #[pyfunction]
-#[pyo3(signature = (series, window_size, n_perm=300, alpha_q=1.0, seed=123, change_type="mean", eps=1e-12, b=None, taper_ratio=0.5, center=true, batch_size=32))]
+#[pyo3(signature = (series, window_size, n_perm=300, alpha_q=1.0, seed=123, change_type="mean", b=None, taper_ratio=0.5, center=true, batch_size=32))]
 #[allow(clippy::too_many_arguments)]
 fn scan_single_window<'py>(
     py: Python<'py>,
@@ -126,7 +115,6 @@ fn scan_single_window<'py>(
     alpha_q: f64,
     seed: u64,
     change_type: &str,
-    eps: f64,
     b: Option<usize>,
     taper_ratio: f64,
     center: bool,
@@ -137,7 +125,11 @@ fn scan_single_window<'py>(
         return Err(PyValueError::new_err("window_size must be positive"));
     }
 
-    let alpha_percent = if alpha_q <= 1.0 { 100.0 * alpha_q } else { alpha_q };
+    let alpha_percent = if alpha_q <= 1.0 {
+        100.0 * alpha_q
+    } else {
+        alpha_q
+    };
     let prefix = PrefixStats::from_series(&series);
     let (_, result) = detect_for_window(
         &series,
@@ -147,7 +139,7 @@ fn scan_single_window<'py>(
         alpha_percent,
         seed,
         ChangeType::parse(change_type)?,
-        eps,
+        1e-12,
         b,
         taper_ratio,
         center,
@@ -179,10 +171,14 @@ fn swal_statistic(series: Vec<f64>, change_type: &str) -> PyResult<usize> {
 #[pyfunction]
 fn wasserstein_statistic(left: Vec<f64>, right: Vec<f64>) -> PyResult<f64> {
     if left.is_empty() || right.is_empty() {
-        return Err(PyValueError::new_err("left and right samples must be non-empty"));
+        return Err(PyValueError::new_err(
+            "left and right samples must be non-empty",
+        ));
     }
     if left.iter().chain(right.iter()).any(|x| !x.is_finite()) {
-        return Err(PyValueError::new_err("samples contain NaN or infinite values"));
+        return Err(PyValueError::new_err(
+            "samples contain NaN or infinite values",
+        ));
     }
     Ok(wasserstein_1d(&left, &right))
 }

@@ -26,7 +26,6 @@ impl ChangeType {
 /// One merged segment of nearby candidate change-points and their votes.
 #[derive(Clone, Debug)]
 pub(crate) struct SegmentInfo {
-    pub(crate) change_points: Vec<usize>,
     pub(crate) votes: BTreeMap<usize, usize>,
     pub(crate) segment_vote: usize,
 }
@@ -38,7 +37,6 @@ pub(crate) struct WindowScanResult {
     pub(crate) starts: Vec<usize>,
     pub(crate) statistics: Vec<f64>,
     pub(crate) tapered_block_bootstrap_threshold: Vec<f64>,
-    pub(crate) localized_regions: Vec<(usize, usize)>,
 }
 
 /// Aggregated voting output used by the Python API.
@@ -55,6 +53,5 @@ pub(crate) struct AggregatedOut {
 pub(crate) struct ScanResult {
     pub(crate) cp_dict: BTreeMap<usize, Vec<usize>>,
     pub(crate) window_results: BTreeMap<usize, WindowScanResult>,
-    pub(crate) segments: BTreeMap<String, SegmentInfo>,
     pub(crate) out: AggregatedOut,
 }

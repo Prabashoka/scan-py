@@ -117,63 +117,55 @@ def scan_cpd(
     min_window: int = 15,
     max_window: Optional[int] = None,
     block_length: Optional[int] = None,
-    block_length_rule: str = "n^(1/3)",
     taper: str = "tukey",
     ipm: str = "wasserstein",
-    tolerance: Optional[int] = None,
+    tolerance_distance: Optional[int] = None,
     random_state: Optional[int] = None,
-    n_jobs: Optional[int] = None,
+    n_jobs: Optional[int] = -1,
     return_all: bool = True,
     *,
     change_type: Optional[str] = None,
-    eps: float = 1e-12,
     batch_size: int = 32,
 ) -> ScanResult:
     """Run SCAN / Ensemble SCAN and return a structured result.
 
-    Change points use Python split indexing: a returned value ``t`` denotes the
-    split between ``x[:t]`` and ``x[t:]``.
-
     Parameters
     ----------
     x:
-        One-dimensional numeric series to scan.
+        One-dimensional time series as input.
     window_sizes:
-        Candidate half-window sizes. If omitted, a small grid is derived from
-        ``min_window`` and ``max_window``.
+        List of window sizes that we need to run the ensemble model. If omitted, set of windows are derived from
+        ``min_window`` and ``max_window`` using builtin ``_default_window_sizes`` function.
     alpha:
-        Bootstrap significance level used by each local scan.
+        Significance level for the hypothesis test.
     n_boot:
         Number of tapered block bootstrap draws per local comparison.
     vote_threshold:
         Minimum ensemble vote score required to retain a candidate change
         point.
-    min_window, max_window:
-        Bounds used only when ``window_sizes`` is omitted.
+    min_window:
+        Bounds to be used when ``window_sizes`` is omitted. 
+    max_window:
+        
     block_length:
-        Optional bootstrap block length. If omitted, the backend applies the
-        selected ``block_length_rule``.
-    block_length_rule:
-        Rule for automatic block lengths. Currently only ``"n^(1/3)"`` is
-        supported by this wrapper.
+        Optional bootstrap block length. If omitted, it is selected
+        automatically using the ``n^(1/3)`` rule.
     taper:
-        Taper applied to bootstrap blocks. Supported values are ``"tukey"`` and
-        ``"none"``.
+        Taper weights to be applied to tapered bootstrap blocks. Supported values are ``"tukey"`` for Tukey's weights and
+        ``"none"`` for classical block bootstrap. 
     ipm:
-        Legacy discrepancy selector. ``"wasserstein"`` maps to distributional
-        change detection.
-    tolerance:
-        Maximum distance for grouping nearby candidates during ensemble voting.
+        IPM discrepancy measure used to detect changes. Currently, this supports ``"wasserstein"`` distance.
+    tolerance_distance:
+        Optional maximum distance for grouping nearby candidates during ensemble voting. This defaults to the minimum window size in the ``window_sizes`` list.
     random_state:
-        Optional random seed passed to the Rust backend.
+        Optional For reproducibility.
     n_jobs:
-        Number of worker threads. Use ``-1`` for all available CPUs.
+        Number of worker threads used for parallel processing. The default
+        ``-1`` uses all available CPU threads.
     return_all:
-        When ``False``, omit per-window diagnostics and raw backend output.
+        When ``False``, omit per-window diagnostics.
     change_type:
         Explicit change type: ``"mean"``, ``"var"``, or ``"distribution"``.
-    eps:
-        Small positive value used by backend numerical safeguards.
     batch_size:
         Number of local comparisons batched per worker.
 
@@ -203,10 +195,7 @@ def scan_cpd(
     if block_length is not None and int(block_length) <= 0:
         raise ValueError("block_length must be positive when provided")
 
-    if block_length is None and block_length_rule != "n^(1/3)":
-        raise ValueError("only block_length_rule='n^(1/3)' is currently supported")
-
-    tol = int(tolerance) if tolerance is not None else min(windows)
+    tol = int(tolerance_distance) if tolerance_distance is not None else min(windows)
     seed = 0 if random_state is None else int(random_state)
     rust_change_type = _change_type_from_ipm(ipm, change_type)
     taper_ratio = _normalize_taper(taper)
@@ -220,15 +209,13 @@ def scan_cpd(
         "min_window": min_window,
         "max_window": max_window,
         "block_length": block_length,
-        "block_length_rule": block_length_rule,
         "taper": taper,
         "ipm": ipm,
         "change_type": rust_change_type,
-        "tolerance": tol,
+        "tolerance_distance": tol,
         "random_state": random_state,
         "n_jobs": requested_n_jobs,
         "return_all": return_all,
-        "eps": eps,
         "batch_size": batch_size,
     }
 
@@ -245,7 +232,6 @@ def scan_cpd(
         resolved_n_jobs,
         "thread",
         rust_change_type,
-        float(eps),
         None if block_length is None else int(block_length),
         taper_ratio,
         True,
@@ -280,8 +266,6 @@ def scan_cpd(
         thresholds={},
         parameters=result.parameters,
         metadata=result.metadata,
-        segments=result.segments,
-        raw={},
     )
 
 
@@ -296,7 +280,6 @@ def scan_single_window(
     ipm: str = "wasserstein",
     random_state: Optional[int] = None,
     change_type: Optional[str] = None,
-    eps: float = 1e-12,
     batch_size: int = 32,
 ) -> WindowResult:
     """Run SCAN for one window size and return per-location diagnostics.
@@ -304,10 +287,10 @@ def scan_single_window(
     Parameters
     ----------
     x:
-        One-dimensional numeric series to scan.
+        One-dimensional time series to detect change-points.
     window_size:
-        Half-window size used for every local comparison.
-    alpha, n_boot, block_length, taper, ipm, random_state, change_type, eps, batch_size:
+        Window size used for every local comparison.
+    alpha, n_boot, block_length, taper, ipm, random_state, change_type, batch_size:
         Detection controls with the same meaning as in :func:`scan_cpd`.
 
     Returns
@@ -329,7 +312,6 @@ def scan_single_window(
         _normalize_alpha(alpha),
         0 if random_state is None else int(random_state),
         _change_type_from_ipm(ipm, change_type),
-        float(eps),
         None if block_length is None else int(block_length),
         _normalize_taper(taper),
         True,

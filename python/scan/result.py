@@ -5,8 +5,8 @@ records into stable Python dataclasses that are easier to inspect, document,
 and pass to plotting or evaluation helpers.
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Mapping, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, List, Mapping
 
 
 @dataclass(frozen=True)
@@ -25,9 +25,6 @@ class WindowResult:
         Local discrepancy statistics aligned with ``starts``.
     tapered_block_bootstrap_threshold:
         Bootstrap thresholds aligned with ``starts``.
-    localized_regions:
-        Inclusive/exclusive local regions used to refine candidate change
-        points.
     """
 
     window_size: int
@@ -35,7 +32,6 @@ class WindowResult:
     starts: List[int]
     statistics: List[float]
     tapered_block_bootstrap_threshold: List[float]
-    localized_regions: List[Tuple[int, int]]
 
     @classmethod
     def from_raw(cls, window_size: int, raw: Mapping[str, Any]) -> "WindowResult":
@@ -48,7 +44,6 @@ class WindowResult:
             tapered_block_bootstrap_threshold=[
                 float(v) for v in raw.get("tapered_block_bootstrap_threshold", [])
             ],
-            localized_regions=[tuple(map(int, pair)) for pair in raw.get("localized_regions", [])],
         )
 
 
@@ -72,11 +67,6 @@ class ScanResult:
         Normalized detector parameters used for the run.
     metadata:
         Runtime metadata such as elapsed seconds and worker counts.
-    segments:
-        Segment metadata returned by the backend, when available.
-    raw:
-        Raw backend dictionary. Hidden from ``repr`` to keep interactive output
-        readable.
     """
 
     change_points: List[int]
@@ -86,8 +76,6 @@ class ScanResult:
     thresholds: Dict[int, Dict[str, List[float]]]
     parameters: Dict[str, Any]
     metadata: Dict[str, Any]
-    segments: Dict[str, Any] = field(default_factory=dict)
-    raw: Dict[str, Any] = field(default_factory=dict, repr=False)
 
     @property
     def cp_dict(self) -> Dict[int, List[int]]:
@@ -149,6 +137,4 @@ def scan_result_from_raw(
         thresholds=thresholds,
         parameters=dict(parameters),
         metadata=dict(metadata),
-        segments=dict(raw.get("segments", {})),
-        raw=dict(raw),
     )

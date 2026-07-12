@@ -82,7 +82,7 @@ result = scan_cpd(
     alpha=5, # significance level
     vote_threshold=0.5,
     random_state=1000, # for reproducibility of the tapred block bootstrap
-    n_jobs=None,  # automatically uses one fewer than the available CPU cores
+    n_jobs=-1,  # use all available CPU threads
 )
 ```
 The function returns a results object, change points can be accessed with the 
@@ -154,11 +154,7 @@ time_series_plot = plot_time_series(
     title="Local time series",
 )
 
-swal_curve_plot = plot_swal_curve(
-    x_region,
-    start=0,
-    end=len(x_region),
-)
+swal_curve_plot = plot_swal_curve(x_region)
 ```
 
 <p align="center">

@@ -110,7 +110,7 @@ def covering_metric(true_cps: Iterable[int], estimated_cps: Iterable[int], n: in
     """Compute a weighted segment-covering score in ``[0, 1]``.
 
     Each true segment is compared with all estimated segments using
-    intersection-over-union, then weighted by the true segment length.
+    intersection-over-union, then weighted by the true segment length uaing Jaccard distance between the segments.
 
     Parameters
     ----------

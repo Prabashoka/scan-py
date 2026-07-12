@@ -87,7 +87,7 @@ def plot_time_series(
     Parameters
     ----------
     x:
-        One-dimensional series to plot.
+        One-dimensional time series.
     change_points:
         Optional detected split locations.
     true_change_points:
@@ -221,11 +221,11 @@ def plot_change_points(
     Parameters
     ----------
     x:
-        One-dimensional series to plot.
+        One-dimensional time series to visualize.
     result:
-        SCAN result containing detected change points.
+        SCAN result object from the ``scan_cpd`` and ``scan_single_window`` containing detected change points.
     true_change_points:
-        Optional ground-truth split locations.
+        Optional True change-points (or annotated).
     index:
         Optional x-axis values.
     x_label, y_label, title:
@@ -374,20 +374,16 @@ def plot_change_points(
 
 def plot_swal_curve(
     x: Iterable[float],
-    start: int,
-    end: int,
     x_label: str = "Time series",
     y_label: str = "Scaled Wasserstein statistic",
     title: Optional[str] = None,
 ):
-    """Plot the SWAL/Wasserstein localization curve inside one region.
+    """Plot the SWAL/Wasserstein localization curve for one change point.
 
     Parameters
     ----------
     x:
-        Full series containing the localized region.
-    start, end:
-        Half-open bounds of the local region to refine and plot.
+        One-dimensional time series containing a single change point.
     x_label, y_label, title:
         Plot labels.
 
@@ -396,18 +392,19 @@ def plot_swal_curve(
     plotnine.ggplot
         Local refinement curve with the selected split marked.
     """
-    y = np.asarray(x, dtype=np.float64).ravel()
-    start = int(start)
-    end = int(end)
+    y = np.asarray(x, dtype=np.float64)
+    if y.ndim != 1:
+        raise ValueError("x must be a one-dimensional time series")
+    if y.size < 3:
+        raise ValueError("x must contain at least 3 observations")
+    if not np.all(np.isfinite(y)):
+        raise ValueError("x contains NaN or infinite values")
 
-    if start < 0 or end > y.size or end - start < 3:
-        raise ValueError("start/end must define a valid region with at least 3 observations")
-
-    cp, stats = refine_wasserstein(y[start:end])
+    cp, stats = refine_wasserstein(y)
 
     df = pd.DataFrame(
         {
-            "split": start + np.arange(len(stats)),
+            "split": np.arange(len(stats)),
             "score": stats,
         }
     )
@@ -417,7 +414,7 @@ def plot_swal_curve(
         ggplot(df, aes("split", "score"))
         + geom_line(color=SCAN_BLUE, size=1.0)
         + geom_vline(
-            xintercept=start + cp,
+            xintercept=cp,
             linetype="dashed",
             color=SCAN_ORANGE,
             size=1.2,

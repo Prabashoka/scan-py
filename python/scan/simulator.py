@@ -323,7 +323,6 @@ class UnivariateSeriesSimulator:
         lognormal_sigma: Optional[float] = None,
         variance_center: Union[str, float] = "pre_change",
         variance_reference: str = "first_segment",
-        eps: float = 1e-12,
     ) -> dict[str, np.ndarray]:
         """Apply mean and/or variance shifts at supplied split locations.
 
@@ -349,9 +348,6 @@ class UnivariateSeriesSimulator:
             Center used when rescaling segment variance.
         variance_reference:
             Reference variance source for multipliers.
-        eps:
-            Small positive floor for near-zero variances.
-
         Returns
         -------
         dict[str, numpy.ndarray]
@@ -449,7 +445,7 @@ class UnivariateSeriesSimulator:
                 raise ValueError("variance_reference must be one of {'first_segment', 'previous_segment', 'global'}")
 
             variance_factor = variance_mults[seg_idx - 1]
-            target_std = np.sqrt(max(float(variance_factor) * ref_var, eps))
+            target_std = np.sqrt(max(float(variance_factor) * ref_var, 1e-12))
 
             # Preserve the selected center while stretching or regenerating the
             # segment to match the requested variance multiplier.
@@ -467,7 +463,7 @@ class UnivariateSeriesSimulator:
                 raise ValueError("variance_center must be 'pre_change', 'global', or a numeric value")
 
             seg_std = float(np.std(seg, ddof=1)) if seg.size > 1 else 0.0
-            if seg_std < eps:
+            if seg_std < 1e-12:
                 y[start:end] = rng.normal(loc=center_value, scale=target_std, size=seg.size)
             else:
                 y[start:end] = center_value + (seg - np.mean(seg)) * (target_std / seg_std)

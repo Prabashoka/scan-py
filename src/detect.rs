@@ -40,7 +40,6 @@ pub(crate) fn detect_for_window(
     let mut starts = Vec::new();
     let mut statistics = Vec::new();
     let mut tapered_block_bootstrap_threshold_values = Vec::new();
-    let mut localized_regions = Vec::new();
 
     let mut start = 0usize;
     while start + w + delta_w <= n {
@@ -73,7 +72,6 @@ pub(crate) fn detect_for_window(
             let k_loc = refine_for_change_type(block, change_type)?;
             let cp = (start + k_loc).clamp(start + 1, block_end - 1);
             change_points.push(cp);
-            localized_regions.push((start, block_end));
 
             // Skip past the flagged region to avoid returning repeated local
             // detections for the same structural change.
@@ -90,7 +88,6 @@ pub(crate) fn detect_for_window(
             starts,
             statistics,
             tapered_block_bootstrap_threshold: tapered_block_bootstrap_threshold_values,
-            localized_regions,
         },
     ))
 }
@@ -185,7 +182,6 @@ pub(crate) fn run_scan_detector(
     Ok(ScanResult {
         cp_dict,
         window_results,
-        segments,
         out,
     })
 }

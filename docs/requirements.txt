@@ -1,2 +1,4 @@
 sphinx>=8.0.0
 sphinx-rtd-theme>=3.0.0
+numpy>=1.23
+pandas>=1.5

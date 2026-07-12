@@ -61,7 +61,6 @@ pub(crate) fn compute_change_points_with_votes(
         out.insert(
             format!("segment_{}", i + 1),
             SegmentInfo {
-                change_points: seg,
                 votes,
                 segment_vote,
             },
@@ -82,9 +81,7 @@ pub(crate) fn leaders_from_segments(
         let mut best_vote = 0usize;
 
         for (&cp, &vote) in &info.votes {
-            if best_cp.is_none()
-                || vote > best_vote
-                || (vote == best_vote && cp < best_cp.unwrap())
+            if best_cp.is_none() || vote > best_vote || (vote == best_vote && cp < best_cp.unwrap())
             {
                 best_cp = Some(cp);
                 best_vote = vote;

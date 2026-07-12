@@ -45,12 +45,8 @@ plots = {
     "thresholds.png": plot_thresholds(result),
 }
 
-# Save a SWAL curve for the first localized region, if one exists.
-for window_result in result.window_results.values():
-    if window_result.localized_regions:
-        start, end = window_result.localized_regions[0]
-        plots["swal_curve.png"] = plot_swal_curve(x, start, end)
-        break
+# The first 400 observations contain the single change point at index 200.
+plots["swal_curve.png"] = plot_swal_curve(x[:400])
 
 for filename, plot in plots.items():
     path = OUT_DIR / filename

@@ -1,60 +1,428 @@
 scan-py documentation
 =====================
 
-API reference for the main SCAN change-point detection workflow, grouped by
-how the package is commonly used.
+Documentation for the scan-py change-point detection framework.  This consists of the complete documentation
+with usage examples.
 
 SCAN
 ====
 
 .. autofunction:: scan.detector.scan_cpd
 
+.. rubric:: ScanResult output
+
+The ``scan_cpd`` function returns a ``ScanResult`` object. This object collects
+the main outputs of the SCAN procedure in one place, including the final
+detected change points, detection scores, voting information, per-window
+diagnostics, threshold values, input parameters, metadata, and the raw backend
+output.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 24 26 50
+
+   * - Attribute
+     - Type
+     - Description
+   * - ``change_points``
+     - ``List[int]``
+     - | Final estimated change-point locations returned by SCAN.
+       | This is the main output users usually need for downstream analysis or plotting.
+   * - ``scores``
+     - ``Dict[int, float]``
+     - | Detection scores associated with candidate change points.
+       | These help assess the relative strength of detected changes.
+   * - ``votes``
+     - ``Dict[int, int]``
+     - | Raw vote count by candidate change point.
+       | This is useful for understanding how stable a detection is across multiple window sizes.
+   * - ``window_results``
+     - ``Dict[int, WindowResult]``
+     - | Diagnostic information from each individual window size.
+       | This helps inspect which window sizes contributed to each detection.
+   * - ``thresholds``
+     - ``Dict[int, Dict[str, List[float]]]``
+     - | Bootstrap thresholds and local statistics keyed by window size.
+       | These are important for reproducibility and for understanding the rejection rule.
+   * - ``parameters``
+     - ``Dict[str, Any]``
+     - | Parameter values used in the call to ``scan_cpd``.
+       | This makes the result self-contained and easier to reproduce.
+   * - ``metadata``
+     - ``Dict[str, Any]``
+     - | Additional run information, such as runtime and backend details.
+       | This is useful for experiments, reporting, debugging, and reproducibility.
+   * - ``segments``
+     - ``Dict[str, Any]``
+     - | Segment metadata returned by the backend, when available.
+       | This is useful for advanced inspection of backend segmentation output.
+   * - ``raw``
+     - ``Dict[str, Any]``
+     - | Raw output returned by the Rust/PyO3 backend before post-processing.
+       | This is mainly useful for advanced users, debugging, or development.
+
+The object returned by ``scan_cpd`` stores the main outputs of the detection
+procedure as attributes. Each attribute can be accessed using the dot operator
+(``.``), which makes it easy to inspect detected change points, detection
+scores, voting information, run parameters, metadata, and per-window results.
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import scan_cpd
+
+   rng = np.random.default_rng(123)
+   x = np.r_[rng.normal(0, 1, 200), rng.normal(2, 1, 200)]
+   result = scan_cpd(x, window_sizes=[25, 40], n_boot=100, random_state=123)
+   print(result.change_points)
+
 .. autofunction:: scan.detector.scan_single_window
 
+.. rubric:: WindowResult output
+
+The ``scan_single_window`` function returns a ``WindowResult`` object. This
+object contains the diagnostics for one scan window size.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 24 26 50
+
+   * - Attribute
+     - Type
+     - Description
+   * - ``window_size``
+     - ``int``
+     - | Half-window size used by the local scan.
+       | This identifies which scan scale produced the diagnostics.
+   * - ``change_points``
+     - ``List[int]``
+     - | Candidate split locations found for this window size.
+       | This is useful for inspecting detections before ensemble voting.
+   * - ``starts``
+     - ``List[int]``
+     - | Start indices of local windows evaluated by the backend.
+       | These align each statistic and threshold with its local comparison.
+   * - ``statistics``
+     - ``List[float]``
+     - | Local discrepancy statistics aligned with ``starts``.
+       | These help inspect where the local scan found strong evidence of change.
+   * - ``tapered_block_bootstrap_threshold``
+     - ``List[float]``
+     - | Bootstrap thresholds aligned with ``starts``.
+       | These show the threshold each local statistic was compared against.
+   * - ``localized_regions``
+     - ``List[Tuple[int, int]]``
+     - | Local regions used to refine candidate change points.
+       | These are useful for debugging and plotting localization behavior.
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import scan_single_window
+
+   x = np.r_[np.zeros(100), np.ones(100)]
+   window_result = scan_single_window(x, window_size=20, n_boot=100)
+   print(window_result.change_points)
+
 Plotting
-=========
+========
 
 .. autofunction:: scan.plotting.plot_time_series
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import plot_time_series
+
+   plot = plot_time_series([0.1, 0.2, 1.4, 1.6], change_points=[2])
+   print(plot)
+
 .. autofunction:: scan.plotting.plot_change_points
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import plot_change_points, scan_cpd
+
+   x = np.r_[np.zeros(100), np.ones(100)]
+   result = scan_cpd(x, window_sizes=[20], n_boot=50)
+   plot = plot_change_points(x, result)
+   print(plot)
 
 .. autofunction:: scan.plotting.plot_swal_curve
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import plot_swal_curve
+
+   x = np.r_[np.zeros(50), np.ones(50)]
+   plot = plot_swal_curve(x, start=25, end=75)
+   print(plot)
+
 .. autofunction:: scan.plotting.plot_vote_scree
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import plot_vote_scree, scan_cpd
+
+   x = np.r_[np.zeros(100), np.ones(100)]
+   result = scan_cpd(x, window_sizes=[20, 30], n_boot=50)
+   plot = plot_vote_scree(result)
+   print(plot)
 
 .. autofunction:: scan.plotting.plot_window_votes
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import plot_window_votes, scan_cpd
+
+   x = np.r_[np.zeros(100), np.ones(100)]
+   result = scan_cpd(x, window_sizes=[20, 30], n_boot=50)
+   plot = plot_window_votes(result)
+   print(plot)
+
 .. autofunction:: scan.plotting.plot_thresholds
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import plot_thresholds
+
+   plot = plot_thresholds()
+   print(plot)
 
 Evaluation Metrics
 ==================
 
 .. autofunction:: scan.metrics.covering_metric
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import covering_metric
+
+   score = covering_metric(true_cps=[100, 200], estimated_cps=[98, 205], n=300)
+   print(score)
+
 .. autofunction:: scan.metrics.precision_recall_cpd
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import precision_recall_cpd
+
+   precision, recall = precision_recall_cpd([100, 200], [98, 205], tolerance=10)
+   print(precision, recall)
 
 .. autofunction:: scan.metrics.f1_score_cpd
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import f1_score_cpd
+
+   f1 = f1_score_cpd([100, 200], [98, 205], tolerance=10)
+   print(f1)
+
 .. autofunction:: scan.metrics.match_change_points
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import match_change_points
+
+   matches = match_change_points([100, 200], [98, 205], tolerance=10)
+   print(matches)
 
 Univariate Simulator
 ====================
 
 .. autoclass:: scan.simulator.UnivariateSeriesSimulator
-   :members: apply_random_shifts, arfima_sim, determine_change_points, fracint_weights, select_change_point_locations, simulate_ar_series, simulate_ar_unif, simulate_arma
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.apply_random_shifts
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   simulator = UnivariateSeriesSimulator(len_series=300, seed=123)
+   base = simulator.simulate_ar_series(rho=0.0, error_type="normal")
+   shifted = simulator.apply_random_shifts(base, [100, 200], change_type="mean")
+   print(shifted["change_points"])
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.arfima_sim
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   simulator = UnivariateSeriesSimulator(len_series=500, seed=123)
+   x = simulator.arfima_sim(d=0.3, sigma=1.0)
+   print(x.shape)
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.determine_change_points
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   n_cps = UnivariateSeriesSimulator.determine_change_points(n=1000, ratio=100)
+   print(n_cps)
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.fracint_weights
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   weights = UnivariateSeriesSimulator.fracint_weights(d=0.3, m=5)
+   print(weights)
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.select_change_point_locations
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   simulator = UnivariateSeriesSimulator(len_series=500, seed=123)
+   cps = simulator.select_change_point_locations(min_points=80, n_cps=3)
+   print(cps)
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.simulate_ar_series
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   simulator = UnivariateSeriesSimulator(len_series=200, seed=123)
+   x = simulator.simulate_ar_series(rho=0.4, error_type="normal")
+   print(x[:5])
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.simulate_ar_unif
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   simulator = UnivariateSeriesSimulator(len_series=200, seed=123)
+   x = simulator.simulate_ar_unif(error_variance=1.0)
+   print(x[:5])
+
+.. automethod:: scan.simulator.UnivariateSeriesSimulator.simulate_arma
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import UnivariateSeriesSimulator
+
+   simulator = UnivariateSeriesSimulator(len_series=200, seed=123)
+   x = simulator.simulate_arma(phi=0.5, theta=0.2)
+   print(x[:5])
 
 .. autofunction:: scan.simulator.simulate_time_series
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import simulate_time_series
+
+   x, true_cps, means, sigmas = simulate_time_series(n=1000, n_cps=3, seed=123)
+   print(true_cps)
 
 Utils
-======
+=====
 
 .. autofunction:: scan.simulator.choose_window_sizes
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import choose_window_sizes
+
+   windows = choose_window_sizes(series_length=1000, n_windows=5, seed=123)
+   print(windows)
+
 .. autofunction:: scan.ensemble.ensemble_vote
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import ensemble_vote
+
+   selected, scores, votes = ensemble_vote({20: [100], 30: [102]}, tolerance=5)
+   print(selected, scores, votes)
 
 .. autofunction:: scan.ensemble.merge_change_points
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   from scan import merge_change_points
+
+   clusters = merge_change_points([98, 100, 205], tolerance=5)
+   print(clusters)
+
 .. autofunction:: scan.bootstrap.adaptive_threshold
 
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import adaptive_threshold
+
+   rng = np.random.default_rng(123)
+   threshold = adaptive_threshold(rng.normal(size=50), rng.normal(size=50), n_boot=100)
+   print(threshold)
+
 .. autofunction:: scan.bootstrap.tapered_block_bootstrap
+
+.. rubric:: Example
+
+.. code-block:: python
+
+   import numpy as np
+   from scan import tapered_block_bootstrap
+
+   samples = tapered_block_bootstrap(np.arange(100), sample_length=50, n_boot=3)
+   print(samples.shape)

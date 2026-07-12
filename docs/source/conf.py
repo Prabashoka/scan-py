@@ -25,7 +25,7 @@ extensions = [
     'sphinx.ext.napoleon' 
 ]
 
-autodoc_mock_imports = ['plotnine']
+autodoc_mock_imports = ['plotnine', 'scan._scan_rust']
 
 
 templates_path = ['_templates']
