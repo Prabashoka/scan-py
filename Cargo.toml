@@ -9,9 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.23", features = ["extension-module"] }
-rand = "0.9"
-rand_xoshiro = "0.7"          # 0.7 targets rand_core 0.9, matching rand 0.9
-rayon = "1"
+scan-core = { git = "https://github.com/Prabashoka/scan-core.git", tag = "v0.1.0" }
 
 [profile.release]
 opt-level = 3

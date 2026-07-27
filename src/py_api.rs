@@ -1,12 +1,15 @@
-use crate::detect::{detect_for_window, run_scan_detector};
-use crate::refine::{refine_cp_cusum, refine_cp_wasserstein, refine_for_change_type};
-use crate::stats::PrefixStats;
-use crate::types::{ChangeType, ScanResult, WindowScanResult};
-use crate::validation::validate_series;
-use crate::wasserstein::wasserstein_1d;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
+use scan_core::{
+    detect_for_window, refine_cp_cusum, refine_cp_wasserstein, refine_for_change_type,
+    run_scan_detector, validate_series, wasserstein_1d, ChangeType, PrefixStats, ScanResult,
+    WindowScanResult,
+};
+
+fn core_error(message: String) -> PyErr {
+    PyValueError::new_err(message)
+}
 
 fn window_result_to_py<'py>(
     py: Python<'py>,
@@ -99,7 +102,8 @@ fn scan_detector<'py>(
         taper_ratio,
         center,
         batch_size,
-    )?;
+    )
+    .map_err(core_error)?;
 
     scan_result_to_py(py, result)
 }
@@ -120,7 +124,7 @@ fn scan_single_window<'py>(
     center: bool,
     batch_size: usize,
 ) -> PyResult<Bound<'py, PyDict>> {
-    validate_series(&series)?;
+    validate_series(&series).map_err(core_error)?;
     if window_size == 0 {
         return Err(PyValueError::new_err("window_size must be positive"));
     }
@@ -138,34 +142,36 @@ fn scan_single_window<'py>(
         n_perm,
         alpha_percent,
         seed,
-        ChangeType::parse(change_type)?,
+        ChangeType::parse(change_type).map_err(core_error)?,
         1e-12,
         b,
         taper_ratio,
         center,
         batch_size.max(1),
-    )?;
+    )
+    .map_err(core_error)?;
 
     window_result_to_py(py, result)
 }
 
 #[pyfunction]
 fn refine_cusum(series: Vec<f64>) -> PyResult<usize> {
-    validate_series(&series)?;
-    refine_cp_cusum(&series)
+    validate_series(&series).map_err(core_error)?;
+    refine_cp_cusum(&series).map_err(core_error)
 }
 
 #[pyfunction]
 fn refine_wasserstein(series: Vec<f64>) -> PyResult<(usize, Vec<f64>)> {
-    validate_series(&series)?;
-    refine_cp_wasserstein(&series)
+    validate_series(&series).map_err(core_error)?;
+    refine_cp_wasserstein(&series).map_err(core_error)
 }
 
 #[pyfunction]
 #[pyo3(signature = (series, change_type="distribution"))]
 fn swal_statistic(series: Vec<f64>, change_type: &str) -> PyResult<usize> {
-    validate_series(&series)?;
-    refine_for_change_type(&series, ChangeType::parse(change_type)?)
+    validate_series(&series).map_err(core_error)?;
+    refine_for_change_type(&series, ChangeType::parse(change_type).map_err(core_error)?)
+        .map_err(core_error)
 }
 
 #[pyfunction]
