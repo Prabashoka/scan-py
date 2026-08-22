@@ -1,6 +1,6 @@
 [package]
 name = "scan-rust"
-version = "0.1.0"
+version = "0.2.1"
 edition = "2021"
 
 [lib]
@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.23", features = ["extension-module"] }
-scan-core = { git = "https://github.com/Prabashoka/scan-core.git", tag = "v0.1.0" }
+scan-core = { git = "https://github.com/Prabashoka/scan-core.git", tag = "v0.2.1" }
 
 [profile.release]
 opt-level = 3

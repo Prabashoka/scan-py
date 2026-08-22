@@ -1,8 +1,32 @@
-/target
-/.venv
-__pycache__/
-*.py[cod]
+# Rust and maturin build output
+/target/
+*.dll
+*.exp
+*.lib
+*.pdb
 *.so
 *.pyd
 *.dylib
+
+# Python build and distribution output
+/build/
+/dist/
+*.whl
+*.tar.gz
+*.egg-info/
+/.venv/
+.venv*/
+
+# Python caches and test/tool output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Platform/editor files
 .DS_Store
+Thumbs.db

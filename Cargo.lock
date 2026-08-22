@@ -262,6 +262,7 @@ checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
 [[package]]
 name = "scan-core"
 version = "0.1.0"
+source = "git+https://github.com/Prabashoka/scan-core.git?tag=v0.2.1#3599b07bc19610d0cf365c032211d01be074f338"
 dependencies = [
  "rand",
  "rand_xoshiro",
@@ -271,7 +272,7 @@ dependencies = [
 
 [[package]]
 name = "scan-rust"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "pyo3",
  "scan-core",

@@ -23,6 +23,7 @@ fn window_result_to_py<'py>(
         "tapered_block_bootstrap_threshold",
         result.tapered_block_bootstrap_threshold,
     )?;
+    out.set_item("localized_regions", result.localized_regions)?;
     Ok(out)
 }
 

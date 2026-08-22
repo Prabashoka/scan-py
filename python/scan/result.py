@@ -6,7 +6,7 @@ and pass to plotting or evaluation helpers.
 """
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping
+from typing import Any, Dict, List, Mapping, Tuple
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,7 @@ class WindowResult:
     starts: List[int]
     statistics: List[float]
     tapered_block_bootstrap_threshold: List[float]
+    localized_regions: List[Tuple[int, int]]
 
     @classmethod
     def from_raw(cls, window_size: int, raw: Mapping[str, Any]) -> "WindowResult":
@@ -43,6 +44,9 @@ class WindowResult:
             statistics=[float(v) for v in raw.get("statistics", [])],
             tapered_block_bootstrap_threshold=[
                 float(v) for v in raw.get("tapered_block_bootstrap_threshold", [])
+            ],
+            localized_regions=[
+                (int(start), int(end)) for start, end in raw.get("localized_regions", [])
             ],
         )
 

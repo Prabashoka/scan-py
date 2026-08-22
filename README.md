@@ -1,5 +1,23 @@
 # scan-py: Sequentially Detecting Change-points via Adaptive Nonparametric Inference
 
+<p align="center">
+  <a href="https://pypi.org/project/scan-py/"><img src="https://img.shields.io/pypi/v/scan-py?label=PyPI" alt="PyPI"></a>
+  <a href="https://pypi.org/project/scan-py/"><img src="https://img.shields.io/pypi/pyversions/scan-py?label=Python" alt="Python versions"></a>
+  <a href="https://pepy.tech/project/scan-py"><img src="https://static.pepy.tech/badge/scan-py" alt="Downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="GPL-3.0 License"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Prabashoka/scan-py/actions/workflows/tests.yml"><img src="https://github.com/Prabashoka/scan-py/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
+  <a href="https://github.com/Prabashoka/scan-py/actions/workflows/tests.yml"><img src="https://img.shields.io/badge/Linux-tested-success?logo=linux" alt="Linux"></a>
+  <a href="https://github.com/Prabashoka/scan-py/actions/workflows/tests.yml"><img src="https://img.shields.io/badge/Windows-tested-success?logo=windows" alt="Windows"></a>
+  <a href="https://github.com/Prabashoka/scan-py/actions/workflows/tests.yml"><img src="https://img.shields.io/badge/macOS-tested-success?logo=apple" alt="macOS"></a>
+</p>
+
+<p align="center">
+  <a href="https://codecov.io/gh/Prabashoka/scan-py"><img src="https://codecov.io/gh/Prabashoka/scan-py/branch/main/graph/badge.svg" alt="Coverage"></a>
+</p>
+
 `scan-py` provides tools for detecting change points general distributional shifts in long univariate time series using Integral Probability Metrics (IPMs). It is aimed at research workflows where users need to simulate time series, detect changes across multiple window sizes, localize change-point positions, evaluate accuracy, and visualize diagnostics. The Python interface is backed by a Rust/PyO3 computation core.
 
 ## Installation
@@ -192,15 +210,7 @@ print(local_cp)
 
 ## Documentation
 
-More detailed documentation is available in the `docs/` folder. The README provides a short overview and a minimal example, while the documentation files give more complete guidance on installation, usage, outputs, and development.
-
-- [Home](README.mdmd): overview of the package and where to start.
-- [Documentation](docs/documentation.md): a short end-to-end example showing how to simulate data, run `scan_cpd`, and inspect the detected change points.
-- [Results](docs/scanresult.md): explanation of the `ScanResult` object returned by `scan_cpd`, including change points, scores, votes, thresholds, diagnostics, parameters, and metadata.
-- [Examples](docs/examples.md): additional examples for different types of change-point detection workflows.
-- [Development](docs/development.md): notes for contributors, including local builds, tests, formatting checks, and package release checks.
-
-A runnable tutorial notebook is also available at [example-usage.ipynb](example-usage.ipynb).
+More detailed documentation is available here : [scan-py documentation](https://prabashoka.github.io/scan-py-documentation/)
 
 ## Citation
 

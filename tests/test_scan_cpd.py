@@ -20,12 +20,13 @@ def simulate_mean_change(n=1000, cps=(200, 400), seed=1):
     return x, list(cps)
 
 
-def simulate_variance_change(n=1000, cps=(200, 400), seed=2):
+def simulate_variance_change(n=1800, cps=(600, 1200), seed=2):
+    """Simulate long low-, high-, then low-variance regimes."""
     rng = np.random.default_rng(seed)
     x = np.empty(n)
     x[: cps[0]] = rng.normal(0, 1.0, cps[0])
-    x[cps[0] : cps[1]] = rng.normal(0, 3.0, cps[1] - cps[0])
-    x[cps[1] :] = rng.normal(0, 0.5, n - cps[1])
+    x[cps[0] : cps[1]] = rng.normal(0, 2.0, cps[1] - cps[0])
+    x[cps[1] :] = rng.normal(0, 0.1, n - cps[1])
     return x, list(cps)
 
 
@@ -88,11 +89,12 @@ def test_detects_variance_changes(scan_cpd):
 
     result = scan_cpd(
         x,
-        window_sizes=[20, 25, 30],
-        n_boot=100,
+        window_sizes=[30, 40, 50, 60, 75],
+        n_boot=500,
         alpha=0.05,
         vote_threshold=0.5,
         random_state=123,
+        change_type="var",
     )
 
     pred_cps = _extract_cps(result)

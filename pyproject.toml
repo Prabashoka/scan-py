@@ -4,9 +4,10 @@ build-backend = "maturin"
 
 [project]
 name = "scan-py"
-version = "0.1.0"
+version = "0.2.1"
 description = "Python package for SCAN change-point detection"
 readme = "README.md"
+license = "GPL-3.0-only"
 requires-python = ">=3.8"
 dependencies = [
     "numpy>=1.23",
@@ -20,6 +21,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Mathematics",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 
 
@@ -40,4 +42,3 @@ Issues = "https://github.com/Prabashoka/scan-py/issues"
 python-source = "python"
 module-name = "scan._scan_rust"
 features = ["pyo3/extension-module"]
-

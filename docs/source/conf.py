@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 project = 'scan-py'
 copyright = '2026, Ashoka Prabashwara'
 author = 'Ashoka Prabashwara'
-release = '0.1.0'
+release = '0.2.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
