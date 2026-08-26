@@ -34,7 +34,7 @@ jobs:
             --release
             --locked
             --out dist
-            --interpreter python
+            --interpreter ${{ runner.os == 'Linux' && format('python{0}', matrix.python-version) || 'python' }}
             --compatibility pypi
 
       - name: Upload wheel
@@ -55,7 +55,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           command: sdist
-          args: --locked --out dist
+          args: --out dist
 
       - name: Upload source distribution
         uses: actions/upload-artifact@v6
