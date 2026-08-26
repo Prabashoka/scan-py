@@ -272,7 +272,7 @@ dependencies = [
 
 [[package]]
 name = "scan-rust"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "pyo3",
  "scan-core",
