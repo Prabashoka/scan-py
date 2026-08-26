@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
@@ -29,6 +29,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           command: build
+          manylinux: "2_17"
           args: >-
             --release
             --locked
