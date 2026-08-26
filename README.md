@@ -1,9 +1,9 @@
-# scan-py: Sequentially Detecting Change-points via Adaptive Nonparametric Inference
+# scan-cpd: Sequentially Detecting Change-points via Adaptive Nonparametric Inference
 
 <p align="center">
-  <a href="https://pypi.org/project/scan-py/"><img src="https://img.shields.io/pypi/v/scan-py?label=PyPI" alt="PyPI"></a>
-  <a href="https://pypi.org/project/scan-py/"><img src="https://img.shields.io/pypi/pyversions/scan-py?label=Python" alt="Python versions"></a>
-  <a href="https://pepy.tech/project/scan-py"><img src="https://static.pepy.tech/badge/scan-py" alt="Downloads"></a>
+  <a href="https://pypi.org/project/scan-cpd/"><img src="https://img.shields.io/pypi/v/scan-cpd?label=PyPI" alt="PyPI"></a>
+  <a href="https://pypi.org/project/scan-cpd/"><img src="https://img.shields.io/pypi/pyversions/scan-cpd?label=Python" alt="Python versions"></a>
+  <a href="https://pepy.tech/project/scan-cpd"><img src="https://static.pepy.tech/badge/scan-cpd" alt="Downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="GPL-3.0 License"></a>
 </p>
 
@@ -14,14 +14,14 @@
   <a href="https://github.com/Prabashoka/scan-py/actions/workflows/tests.yml"><img src="https://img.shields.io/badge/macOS-tested-success?logo=apple" alt="macOS"></a>
 </p>
 
-`scan-py` provides tools for detecting change points general distributional shifts in long univariate time series using Integral Probability Metrics (IPMs). It is aimed at research workflows where users need to simulate time series, detect changes across multiple window sizes, localize change-point positions, evaluate accuracy, and visualize diagnostics. The Python interface is backed by a Rust/PyO3 computation core.
+`scan-cpd` provides tools for detecting change points general distributional shifts in long univariate time series using Integral Probability Metrics (IPMs). It is aimed at research workflows where users need to simulate time series, detect changes across multiple window sizes, localize change-point positions, evaluate accuracy, and visualize diagnostics. The Python interface is backed by a Rust/PyO3 computation core.
 
 ## Installation
 
 SCAN Py can be installed from PyPI using pip:
 
 ```bash
-pip install scan-py
+pip install scan-cpd
 ```
 For local development, clone the repository and build the package in an isolated virtual environment:
 
@@ -206,7 +206,7 @@ print(local_cp)
 
 ## Documentation
 
-More detailed documentation is available here : [scan-py documentation](https://prabashoka.github.io/scan-py-documentation/)
+More detailed documentation is available here: [scan-cpd documentation](https://prabashoka.github.io/scan-py-documentation/)
 
 ## Citation
 

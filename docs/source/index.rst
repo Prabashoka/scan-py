@@ -1,7 +1,7 @@
-scan-py documentation
-=====================
+scan-cpd documentation
+======================
 
-Documentation for the scan-py change-point detection framework.  This consists of the complete documentation
+Documentation for the scan-cpd change-point detection framework.  This consists of the complete documentation
 with usage examples.
 
 SCAN

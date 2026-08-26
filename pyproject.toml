@@ -3,12 +3,12 @@ requires = ["maturin>=1.9.4,<2"]
 build-backend = "maturin"
 
 [project]
-name = "scan-py"
+name = "scan-cpd"
 version = "0.2.1"
 description = "Python package for SCAN change-point detection"
 readme = "README.md"
 license = "GPL-3.0-only"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.23",
     "pandas>=1.5",

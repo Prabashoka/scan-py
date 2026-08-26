@@ -1,5 +1,5 @@
-scan-py
-=======
+scan-cpd
+========
 
 .. toctree::
    :maxdepth: 4

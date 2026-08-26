@@ -12,7 +12,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "python")))
 
-project = 'scan-py'
+project = 'scan-cpd'
 copyright = '2026, Ashoka Prabashwara'
 author = 'Ashoka Prabashwara'
 release = '0.2.1'
