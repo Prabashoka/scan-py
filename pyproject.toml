@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "scan-cpd"
-version = "0.2.1"
+version = "0.2.2"
 description = "Python package for SCAN change-point detection"
 readme = "README.md"
 license = "GPL-3.0-only"
