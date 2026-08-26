@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://pypi.org/project/scan-cpd/"><img src="https://img.shields.io/pypi/v/scan-cpd?label=PyPI" alt="PyPI"></a>
   <a href="https://pypi.org/project/scan-cpd/"><img src="https://img.shields.io/pypi/pyversions/scan-cpd?label=Python" alt="Python versions"></a>
-  <a href="https://pepy.tech/project/scan-cpd"><img src="https://api.pepy.tech/badge/scan-cpd" alt="Downloads"></a>
+  <a href="https://pypistats.org/packages/scan-cpd"><img src="https://img.shields.io/pypi/dm/scan-cpd?label=downloads" alt="Downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="GPL-3.0 License"></a>
 </p>
 
