@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://pypi.org/project/scan-cpd/"><img src="https://img.shields.io/pypi/v/scan-cpd?label=PyPI" alt="PyPI"></a>
   <a href="https://pypi.org/project/scan-cpd/"><img src="https://img.shields.io/pypi/pyversions/scan-cpd?label=Python" alt="Python versions"></a>
-  <a href="https://pepy.tech/project/scan-cpd"><img src="https://static.pepy.tech/badge/scan-cpd" alt="Downloads"></a>
+  <a href="https://pepy.tech/project/scan-cpd"><img src="https://api.pepy.tech/badge/scan-cpd" alt="Downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="GPL-3.0 License"></a>
 </p>
 
@@ -114,7 +114,7 @@ The detected change points can also be visualized using `plot_change_points`. Th
 ```python
 plot_change_points(x, result)
 ```
-![Detected change points](https://github.com/Prabashoka/scan-py/blob/main/plots/change_points.png)
+![Detected change points](https://raw.githubusercontent.com/Prabashoka/scan-py/main/plots/change_points.png)
 To save the plot as an image:
 ```python
 plot = plot_change_points(x, result)
@@ -132,7 +132,7 @@ plot_vote_scree(result)
 The x-axis shows the voting threshold, denoted by ν, and the y-axis shows the number of retained change points at each threshold. A lower threshold keeps more candidate change points, while a higher threshold keeps only candidates supported by more window sizes.
 In practice, choose a value near the point where the curve begins to flatten. This avoids keeping many weak detections while preserving stable change points that are supported across multiple window sizes.
 
-![Majority voting scree plot](https://github.com/Prabashoka/scan-py/blob/main/plots/vote_scree.png)
+![Majority voting scree plot](https://raw.githubusercontent.com/Prabashoka/scan-py/main/plots/vote_scree.png)
 
 ### SWAL Statistic
 
@@ -172,8 +172,8 @@ swal_curve_plot = plot_swal_curve(x_region)
 ```
 
 <p align="center">
-  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/local_time_series.png" width="48%">
-  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/swal_curve.png" width="48%">
+  <img src="https://raw.githubusercontent.com/Prabashoka/scan-py/main/plots/local_time_series.png" width="48%">
+  <img src="https://raw.githubusercontent.com/Prabashoka/scan-py/main/plots/swal_curve.png" width="48%">
 </p>
 
 **Change in distribution**
@@ -199,8 +199,8 @@ local_cp = swal_statistic(
 print(local_cp)
 ```
 <p align="center">
-  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/distribution_change_time_series.png" width="48%">
-  <img src="https://github.com/Prabashoka/scan-py/blob/main/plots/distribution_change_swal_curve.png" width="48%">
+  <img src="https://raw.githubusercontent.com/Prabashoka/scan-py/main/plots/distribution_change_time_series.png" width="48%">
+  <img src="https://raw.githubusercontent.com/Prabashoka/scan-py/main/plots/distribution_change_swal_curve.png" width="48%">
 </p>
 
 
